@@ -133,6 +133,52 @@
       .status.bad {
         border-color: var(--bad);
       }
+      .app-summary {
+        display: grid;
+        gap: 12px;
+        margin: 14px 0 18px;
+      }
+      .app-summary-row {
+        display: grid;
+        gap: 4px;
+      }
+      .app-summary-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .permission-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .permission {
+        background: #26344b;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--ink);
+        font-size: 13px;
+        padding: 4px 9px;
+      }
+      .permission strong {
+        color: #ffd27a;
+      }
+      details {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+      summary {
+        color: var(--muted);
+        cursor: pointer;
+        font-weight: 700;
+      }
+      details[open] summary {
+        color: var(--ink);
+        margin-bottom: 10px;
+      }
       code {
         background: #26344b;
         padding: 2px 5px;
@@ -174,7 +220,7 @@
         <div id="check-status" class="status hidden" role="status"></div>
         <div id="existing-app" class="hidden">
           <h2>Existing purpose-scoped App</h2>
-          <p id="existing-summary"></p>
+          <div id="existing-summary" class="app-summary"></div>
           <a
             id="app-settings-link"
             class="button secondary"
@@ -189,23 +235,30 @@
             rel="noopener"
             >Manage repository access</a
           >
-          <label for="replacement-key"
-            >Rotate or repair <code>__APP_SECRET__</code></label
-          >
-          <input
-            id="replacement-key"
-            type="file"
-            accept=".pem,application/x-pem-file,text/plain"
-          />
-          <button id="repair-key" type="button" class="secondary">
-            Update organization credential
-          </button>
-          <p class="muted">
-            Generate a new private key in the App settings first. The selected
-            PEM is sent only to this loopback service and is never stored on
-            disk by the helper.
-          </p>
-          <div id="repair-status" class="status hidden" role="status"></div>
+          <details>
+            <summary>Rotate or repair the organization credential</summary>
+            <p class="muted">
+              This is only needed if the stored credential was revoked or
+              expired. GitHub never exposes an existing private key again, so
+              generate a new one in App settings first.
+            </p>
+            <label for="replacement-key"
+              >New <code>__APP_SECRET__</code> PEM</label
+            >
+            <input
+              id="replacement-key"
+              type="file"
+              accept=".pem,application/x-pem-file,text/plain"
+            />
+            <button id="repair-key" type="button" class="secondary">
+              Update organization credential
+            </button>
+            <p class="muted">
+              The selected PEM is sent only to this loopback service and is
+              never stored on disk by the helper.
+            </p>
+            <div id="repair-status" class="status hidden" role="status"></div>
+          </details>
         </div>
       </div>
 
@@ -334,6 +387,60 @@
           return $("organization").value.trim();
         }
 
+        function renderExistingSummary(result) {
+          const summary = $("existing-summary");
+          summary.replaceChildren();
+
+          const identity = document.createElement("div");
+          identity.className = "app-summary-row";
+          identity.innerHTML =
+            '<span class="app-summary-label">App</span><span></span>';
+          identity.lastElementChild.textContent =
+            (result.app_slug || "Not installed") +
+            " (ID " +
+            (configuredAppId || "unknown") +
+            ")";
+          summary.append(identity);
+
+          const access = document.createElement("div");
+          access.className = "app-summary-row";
+          access.innerHTML =
+            '<span class="app-summary-label">Repository access</span><span></span>';
+          access.lastElementChild.textContent =
+            result.repository_selection === "all"
+              ? "All repositories"
+              : result.repository_selection || "Not installed";
+          summary.append(access);
+
+          const permissions = document.createElement("div");
+          permissions.className = "app-summary-row";
+          permissions.innerHTML =
+            '<span class="app-summary-label">Installed permissions</span>';
+          const list = document.createElement("div");
+          list.className = "permission-list";
+          Object.entries(result.permissions || {})
+            .sort(([left], [right]) => left.localeCompare(right))
+            .forEach(([name, level]) => {
+              const badge = document.createElement("span");
+              badge.className = "permission";
+              badge.innerHTML = "<strong></strong>: <span></span>";
+              badge.firstElementChild.textContent = name.replaceAll("_", " ");
+              badge.lastElementChild.textContent = level;
+              list.append(badge);
+            });
+          permissions.append(list);
+          summary.append(permissions);
+
+          const recommendation = document.createElement("div");
+          recommendation.className = "app-summary-row";
+          recommendation.innerHTML =
+            '<span class="app-summary-label">Recommendation</span><span></span>';
+          recommendation.lastElementChild.textContent = result.healthy
+            ? "Keep this App. No reauthentication is needed."
+            : "Review permissions and installation before replacing it.";
+          summary.append(recommendation);
+        }
+
         function repairLinks(result) {
           if (!result.app_slug) return;
           appSlug = result.app_slug;
@@ -370,19 +477,7 @@
             repairLinks(result);
             if (configuredAppId || result.app_slug) {
               $("existing-app").classList.remove("hidden");
-              $("existing-summary").textContent =
-                "App " +
-                (result.app_slug || "not installed") +
-                " (ID " +
-                (configuredAppId || "unknown") +
-                "). Permissions: " +
-                JSON.stringify(result.permissions || {}) +
-                "; repository access: " +
-                (result.repository_selection || "not installed") +
-                ". Recommendation: " +
-                (result.healthy
-                  ? "keep this App; no reauthentication is needed."
-                  : "review permissions and installation before replacing it.");
+              renderExistingSummary(result);
               $("create-card").querySelector("p").textContent =
                 "An App is already configured for " +
                 appProfile +

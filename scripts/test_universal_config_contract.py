@@ -389,6 +389,7 @@ def main() -> None:
         "unknown": sorted(forwarded - declared),
     }
     assert "config_path: .github/bos-universal-config.json" in kicker
+    assert "trusted_app_slugs: ${{ vars.GATEWALL_APP_SLUG }}" in kicker
     assert "config_path: .github/bos-universal-config.json" in action_test_workflow
 
     monitor_workflow = (ROOT / ".github/workflows/monitor-upstream-release.yml").read_text()

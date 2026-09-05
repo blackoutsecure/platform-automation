@@ -151,6 +151,7 @@ jobs:
           organization: ${{ github.repository_owner }}
           repository: ${{ github.repository }}
           event_name: ${{ github.event_name }}
+          trusted_app_slugs: ${{ vars.GATEWALL_APP_SLUG }}
           enterprise_slug: ${{ vars.GATEKEEPER_ENTERPRISE_SLUG }}
           required_teams: ${{ vars.GATEKEEPER_REQUIRED_TEAMS }}
           allow_org_admin: ${{ vars.GATEKEEPER_ALLOW_ORG_ADMIN != 'false' }}

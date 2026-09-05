@@ -111,6 +111,7 @@ config, so the gate never depends on a job that runs after it:
 | `GATEKEEPER_ENTERPRISE_SLUG`          | Enterprise slug for the owner lookup. Empty skips the check.           |
 | `GATEKEEPER_REQUIRED_TEAMS`           | Comma-separated team slugs whose active members may dispatch.          |
 | `GATEKEEPER_ALLOW_ORG_ADMIN`          | Set to `false` to stop treating org owners as authorized.              |
+| `GATEWALL_APP_SLUG`                   | Exact Gatewall App slug trusted for protected machine handoffs.        |
 | `GATEKEEPER_REQUIRE_ENTERPRISE_OWNER` | Set to `false` to relax the `high` gate-level enterprise requirement.  |
 | `GATEKEEPER_HARDEN_RUNNER`            | Set to `true` to enable `step-security/harden-runner` egress auditing. |
 | `GATEKEEPER_EGRESS_POLICY`            | `audit` (default) or `block` when runner hardening is enabled.         |
