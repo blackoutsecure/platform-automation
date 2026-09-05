@@ -231,12 +231,23 @@ jobs:
               | jq -r 'to_entries[] | "\(.key)=\(.value)"')
           fi
 
+          discovery_error="${RUNNER_TEMP}/kicker-discovery-error"
+          : > "${discovery_error}"
           mapfile -t CANDIDATES < <(
-            gh api --paginate "orgs/${ORG}/repos?per_page=100" \
-              --jq '.[] | select(.disabled | not)
+            gh api --paginate "installation/repositories?per_page=100" \
+              --jq '.repositories[]' 2>"${discovery_error}" \
+              | jq -r --arg org "${ORG}" 'select(.owner.login == $org and (.disabled | not))
                         | [.full_name, (.fork|tostring), (.archived|tostring), .default_branch]
                         | @tsv'
           )
+          if [ ! -s "${discovery_error}" ] && [ "${#CANDIDATES[@]}" -eq 0 ]; then
+            echo "::error::Gatewall installation repository discovery returned zero repositories for '${ORG}'."
+            exit 1
+          fi
+          if [ -s "${discovery_error}" ]; then
+            echo "::error::Gatewall installation repository discovery failed: $(tr '\n' ' ' < "${discovery_error}")"
+            exit 1
+          fi
 
           matches_filter() {
             local name="$1" short="${1#*/}" token
