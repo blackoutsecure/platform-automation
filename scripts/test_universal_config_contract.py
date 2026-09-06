@@ -707,6 +707,7 @@ def main() -> None:
     assert "[RUNTIME] Blackout Secure Managed File Sync" in sync_backend
     assert "uses: ./hub-runtime/.github/actions/universal-config" in sync_backend
     assert "inputs.hub_ref != 'auto' && inputs.hub_ref" in sync_backend
+    assert "github.ref_name == 'main' && 'main' || 'dev'" in sync_backend
     assert "github.event_name == 'merge_group'" in sync_backend
 
     # ── standardized reporting ────────────────────────────────────
