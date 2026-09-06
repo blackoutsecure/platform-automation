@@ -8,11 +8,11 @@ inputs:
   base_ref:
     description: github.base_ref from pull request events.
     required: false
-    default: ''
+    default: ""
   merge_group_base_ref:
     description: github.event.merge_group.base_ref from merge-group events.
     required: false
-    default: ''
+    default: ""
   ref_name:
     description: github.ref_name from the caller.
     required: true
