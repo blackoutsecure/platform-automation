@@ -728,6 +728,17 @@ def main() -> None:
     assert "## Detailed Findings" in job_report
     assert '"⚪ Not Assessed"' in job_report
 
+    # Redaction defends the publicly readable surfaces (log, job summary,
+    # uploaded artifact). It must stay on unless a caller opts out.
+    assert "redact_sensitive:" in job_report
+    assert "redaction_placeholder:" in job_report
+    assert 'REPORT_REDACT_SENSITIVE: ${{ inputs.redact_sensitive }}' in job_report
+    assert re.search(
+        r"redact_sensitive:\n(?:.*\n)*?\s+default: \"true\"", job_report
+    ), "job-report redaction must default to enabled"
+    for redacted_field in ("control", "evidence", "remediation"):
+        assert f'"{redacted_field}": redact(' in job_report
+
     report_refs = {
         "uses: ./hub-runtime/.github/actions/job-report",
         "uses: ./hub-source/.github/actions/job-report",
