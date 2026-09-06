@@ -552,6 +552,7 @@ def main() -> None:
     resolver = (ROOT / ".github/actions/resolve-hub-ref/action.yml").read_text()
     assert "name: Resolve hub ref" in resolver
     assert 'echo "ref=${ref}"' in resolver
+    assert '[[ "${ref}" == "main" ]] || ref="dev"' in resolver
 
 
     repo_metadata_workflow = (
