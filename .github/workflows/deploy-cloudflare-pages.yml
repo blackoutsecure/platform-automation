@@ -4,7 +4,7 @@ name: Cloudflare Pages Deploy
   workflow_call:
     inputs:
       cloudflare_project_name:
-        description: 'Cloudflare Pages project name (lowercase letters, digits, hyphens; 1–58 chars).'
+        description: "Cloudflare Pages project name (lowercase letters, digits, hyphens; 1–58 chars)."
         required: true
         type: string
       deployment_environment:
@@ -16,7 +16,7 @@ name: Cloudflare Pages Deploy
           environment binding.
         required: false
         type: string
-        default: ''
+        default: ""
       site_url:
         description: >-
           Canonical site URL (e.g. `https://example.com`). Required when any
@@ -24,21 +24,21 @@ name: Cloudflare Pages Deploy
           summary.
         required: false
         type: string
-        default: ''
+        default: ""
       public_dir:
-        description: 'Source directory in the caller repo to copy from.'
+        description: "Source directory in the caller repo to copy from."
         required: false
         type: string
-        default: '.'
+        default: "."
       deploy_dir:
         description: >-
           Staging directory that gets uploaded to Cloudflare Pages. Created
           on demand. Must be a repo-relative path.
         required: false
         type: string
-        default: './dist'
+        default: "./dist"
       clean_deploy_dir:
-        description: 'Remove `deploy_dir` before staging files.'
+        description: "Remove `deploy_dir` before staging files."
         required: false
         type: boolean
         default: true
@@ -49,7 +49,7 @@ name: Cloudflare Pages Deploy
           shell; missing entries fail the run.
         required: false
         type: string
-        default: ''
+        default: ""
       copy_dirs:
         description: >-
           Newline-separated list of directories to copy recursively into
@@ -58,7 +58,7 @@ name: Cloudflare Pages Deploy
           Both paths must be repo-relative and must not contain `..`.
         required: false
         type: string
-        default: ''
+        default: ""
       prebuild_command:
         description: >-
           Optional shell command run from `working_directory` (or repo root
@@ -70,14 +70,14 @@ name: Cloudflare Pages Deploy
           the calling workflow itself.
         required: false
         type: string
-        default: ''
+        default: ""
       working_directory:
         description: >-
           Working directory used for `prebuild_command` and `wrangler-action`.
           Empty means the repository root.
         required: false
         type: string
-        default: ''
+        default: ""
       branch:
         description: >-
           Branch to publish to. Cloudflare Pages treats deploys whose branch
@@ -86,24 +86,24 @@ name: Cloudflare Pages Deploy
           (`github.ref_name` on push events, the head ref on PRs).
         required: false
         type: string
-        default: ''
+        default: ""
       commit_message:
-        description: 'Override the commit message attached to the Pages deploy.'
+        description: "Override the commit message attached to the Pages deploy."
         required: false
         type: string
-        default: ''
+        default: ""
       wrangler_version:
-        description: 'Pin wrangler to a specific version, range, or tag (e.g. `4`, `^4.0.0`, `latest`). Empty uses the action default.'
+        description: "Pin wrangler to a specific version, range, or tag (e.g. `4`, `^4.0.0`, `latest`). Empty uses the action default."
         required: false
         type: string
-        default: ''
+        default: ""
       extra_wrangler_args:
         description: >-
           Extra arguments appended (verbatim) to `wrangler pages deploy`.
           Newlines are converted to spaces. Use with care.
         required: false
         type: string
-        default: ''
+        default: ""
       ai_bindings:
         description: >-
           JSON array of Workers AI binding names to ensure on the Pages
@@ -127,7 +127,7 @@ name: Cloudflare Pages Deploy
           `CLOUDFLARE_PAGES_ADMIN_TOKEN` secret to use a separate token.
         required: false
         type: string
-        default: '[]'
+        default: "[]"
       deploy_artifact_name:
         description: >-
           When set, the deploy job downloads the named build artifact
@@ -143,14 +143,14 @@ name: Cloudflare Pages Deploy
           — those are validated as empty when this input is set.
         required: false
         type: string
-        default: ''
+        default: ""
       deploy:
         description: >-
           `'true'`/`'false'` to force the deploy step. Empty (default) deploys
           only on push events to the repository's default branch.
         required: false
         type: string
-        default: ''
+        default: ""
       runs_on:
         description: >-
           Optional runner override for the build/deploy job. When empty
@@ -165,7 +165,7 @@ name: Cloudflare Pages Deploy
           guaranteed to evaluate against a valid label set.
         required: false
         type: string
-        default: ''
+        default: ""
       checkout_fetch_depth:
         description: >-
           `fetch-depth` passed to `actions/checkout`. Defaults to `0`
@@ -183,7 +183,7 @@ name: Cloudflare Pages Deploy
           requests pull the freshly published assets. Has no effect when
           the deploy step is skipped. The zone is identified in this
           order: (1) `vars.CLOUDFLARE_ZONE_ID` if set, (2)
-          `secrets.CLOUDFLARE_ZONE_ID` for back-compat, (3) auto-resolved
+          `secrets.CLOUDFLARE_ZONE_ID` if configured, (3) auto-resolved
           from the `site_url` input via the Cloudflare API (requires the
           API token to carry `Zone:Read`). When none are available the
           purge is skipped with a notice annotation. Set to `false` to
@@ -194,21 +194,47 @@ name: Cloudflare Pages Deploy
 
       # ── Sitemap generator ──────────────────────────────────────────
       generate_sitemap:
-        description: 'Run the Blackout Secure sitemap generator before deploy.'
+        description: "Run the Blackout Secure sitemap generator before deploy."
         required: false
         type: boolean
         default: false
 
+      # ── Generator compliance audit ─────────────────────────────────
+      # The sitemap and security.txt generators each ship a posture audit
+      # (SEO / RFC 9116). The hub supplies org-wide rule severities from
+      # `sync-files/config/*-generator-global-config.json`; these inputs
+      # control the run disposition and where the reports land.
+      generator_audit:
+        description: >-
+          Run the sitemap and security.txt generators' built-in compliance
+          audits and collect their reports. Disabled by default so existing
+          consumers keep byte-identical deploy behaviour.
+        required: false
+        type: boolean
+        default: false
+      generator_audit_fail_on:
+        description: >-
+          Audit exit policy forwarded to both generators: `fail` blocks the
+          deploy on any failing control, `never` keeps the audit advisory.
+        required: false
+        type: string
+        default: "never"
+      generator_audit_artifact_name:
+        description: "Artifact name for the collected generator audit reports."
+        required: false
+        type: string
+        default: "site-compliance-reports"
+
       # ── robots.txt generator ───────────────────────────────────────
       generate_robots:
-        description: 'Run the Blackout Secure robots.txt generator before deploy.'
+        description: "Run the Blackout Secure robots.txt generator before deploy."
         required: false
         type: boolean
         default: false
 
       # ── security.txt generator ─────────────────────────────────────
       generate_security_txt:
-        description: 'Run the Blackout Secure security.txt generator before deploy.'
+        description: "Run the Blackout Secure security.txt generator before deploy."
         required: false
         type: boolean
         default: false
@@ -227,68 +253,68 @@ name: Cloudflare Pages Deploy
           is `true`.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ── Web App Manifest generator ─────────────────────────────────
       generate_manifest:
-        description: 'Run the Blackout Secure Web Application Manifest generator before deploy.'
+        description: "Run the Blackout Secure Web Application Manifest generator before deploy."
         required: false
         type: boolean
         default: false
       manifest_name:
-        description: 'PWA manifest `name`. Required when `generate_manifest` is `true`.'
+        description: "PWA manifest `name`. Required when `generate_manifest` is `true`."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_short_name:
-        description: 'PWA manifest `short_name`.'
+        description: "PWA manifest `short_name`."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_description:
-        description: 'PWA manifest `description`.'
+        description: "PWA manifest `description`."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_orientation:
-        description: 'PWA manifest `orientation` (e.g. `portrait-primary`).'
+        description: "PWA manifest `orientation` (e.g. `portrait-primary`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_theme_color:
-        description: 'PWA manifest `theme_color` as a CSS hex colour (`#000` or `#000000`).'
+        description: "PWA manifest `theme_color` as a CSS hex colour (`#000` or `#000000`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_background_color:
-        description: 'PWA manifest `background_color` as a CSS hex colour (`#000` or `#000000`).'
+        description: "PWA manifest `background_color` as a CSS hex colour (`#000` or `#000000`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_lang:
-        description: 'PWA manifest `lang` (BCP 47 tag, e.g. `en-US`).'
+        description: "PWA manifest `lang` (BCP 47 tag, e.g. `en-US`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_dir:
-        description: 'PWA manifest `dir` (`ltr`, `rtl`, or `auto`).'
+        description: "PWA manifest `dir` (`ltr`, `rtl`, or `auto`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_categories:
-        description: 'PWA manifest `categories` as a comma-separated list (e.g. `business,productivity`).'
+        description: "PWA manifest `categories` as a comma-separated list (e.g. `business,productivity`)."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_icons_dir:
-        description: 'Directory inside `deploy_dir` to scan for icon files (e.g. `/assets/`).'
+        description: "Directory inside `deploy_dir` to scan for icon files (e.g. `/assets/`)."
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ── _redirects generator (hub-local composite action) ───────────
       generate_redirects:
-        description: 'Run the Blackout Secure redirects generator before deploy.'
+        description: "Run the Blackout Secure redirects generator before deploy."
         required: false
         type: boolean
         default: false
@@ -301,7 +327,7 @@ name: Cloudflare Pages Deploy
           `<deploy_dir>/_redirects` before deploy.
         required: false
         type: string
-        default: ''
+        default: ""
       redirects_replace_existing:
         description: >-
           When `false` (default), the generator fails if `_redirects`
@@ -331,7 +357,7 @@ name: Cloudflare Pages Deploy
           output). Default `security,cache`.
         required: false
         type: string
-        default: 'security,cache'
+        default: "security,cache"
       headers_csp:
         description: >-
           Optional `Content-Security-Policy` value appended to the
@@ -339,7 +365,7 @@ name: Cloudflare Pages Deploy
           (Cloudflare limit: 2000 chars per line).
         required: false
         type: string
-        default: ''
+        default: ""
       headers_hsts_max_age:
         description: >-
           `Strict-Transport-Security` max-age in seconds. Default
@@ -347,21 +373,21 @@ name: Cloudflare Pages Deploy
           to suppress HSTS entirely.
         required: false
         type: string
-        default: '63072000'
+        default: "63072000"
       headers_permissions_policy:
         description: >-
           `Permissions-Policy` value. Default disables the high-risk
           feature set a static site never needs. Set empty to omit.
         required: false
         type: string
-        default: 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
+        default: "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
       headers_cache_html_control:
         description: >-
           `Cache-Control` value applied to `/*` by the `cache` preset.
           Default `public, max-age=0, must-revalidate`.
         required: false
         type: string
-        default: 'public, max-age=0, must-revalidate'
+        default: "public, max-age=0, must-revalidate"
       headers_cache_assets_pattern:
         description: >-
           Path pattern for the long-cache rule emitted by the `cache`
@@ -369,7 +395,7 @@ name: Cloudflare Pages Deploy
           fingerprinted paths (e.g. `/_next/static/*`).
         required: false
         type: string
-        default: '/assets/*'
+        default: "/assets/*"
       headers_cache_assets_control:
         description: >-
           `Cache-Control` value applied to `headers_cache_assets_pattern`.
@@ -377,7 +403,7 @@ name: Cloudflare Pages Deploy
           fingerprinted assets — never apply to mutable paths.
         required: false
         type: string
-        default: 'public, max-age=31536000, immutable'
+        default: "public, max-age=31536000, immutable"
       generate_common_content_headers:
         description: >-
           Automatically emit common content headers for staged files
@@ -390,25 +416,25 @@ name: Cloudflare Pages Deploy
           `Cache-Control` value for `/.well-known/security.txt`.
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       common_robots_txt_cache_control:
         description: >-
           `Cache-Control` value for `/robots.txt`.
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       common_sitemap_xml_cache_control:
         description: >-
           `Cache-Control` value for `/sitemap.xml`.
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       common_humans_txt_cache_control:
         description: >-
           `Cache-Control` value for `/humans.txt`.
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       headers_custom_rules:
         description: >-
           Raw `_headers` content appended verbatim AFTER all preset
@@ -416,7 +442,7 @@ name: Cloudflare Pages Deploy
           lines indented with two spaces.
         required: false
         type: string
-        default: ''
+        default: ""
       headers_replace_existing:
         description: >-
           When `false` (default), the generator fails if `_headers`
@@ -445,22 +471,21 @@ name: Cloudflare Pages Deploy
         required: false
       CLOUDFLARE_ACCOUNT_ID:
         description: >-
-          **Back-compat input. Prefer `vars.CLOUDFLARE_ACCOUNT_ID`** —
-          account IDs are public Cloudflare identifiers, not secrets,
-          and storing them as secrets makes the runner mask the value
-          (which prevents `needs.<job>.outputs.account_id` from being
-          readable in downstream jobs). When neither this secret nor
-          the var is set, the workflow auto-resolves the account via
-          `GET /accounts` against `CLOUDFLARE_API_TOKEN`. An account-
-          scoped Pages:Edit token returns exactly one account, so the
-          lookup is unambiguous. Provide it explicitly only when the
-          token can access multiple accounts, or to skip the lookup
-          round trip on every run.
+          Optional account ID override. Prefer `vars.CLOUDFLARE_ACCOUNT_ID`
+          because account IDs are public Cloudflare identifiers, not
+          secrets, and storing them as secrets masks the value from
+          downstream jobs reading `needs.<job>.outputs.account_id`.
+          When neither this value nor the var is set, the workflow
+          auto-resolves the account via `GET /accounts` against
+          `CLOUDFLARE_API_TOKEN`. An account-scoped Pages:Edit token
+          returns exactly one account, so the lookup is unambiguous.
+          Provide it explicitly only when the token can access multiple
+          accounts, or to skip the lookup round trip on every run.
         required: false
       CLOUDFLARE_ZONE_ID:
         description: >-
-          **Back-compat input. Prefer `vars.CLOUDFLARE_ZONE_ID`** —
-          zone IDs are public Cloudflare identifiers. Optional — the
+          Optional zone ID override. Prefer `vars.CLOUDFLARE_ZONE_ID`
+          because zone IDs are public Cloudflare identifiers. The
           cache-purge step auto-resolves the zone from the `site_url`
           input via the Cloudflare API when neither the var nor the
           secret is set, so most callers can leave it empty and just
@@ -470,33 +495,30 @@ name: Cloudflare Pages Deploy
         required: false
     outputs:
       deployed:
-        description: '`true` when wrangler actually pushed a deploy.'
+        description: "`true` when wrangler actually pushed a deploy."
         value: ${{ jobs.deploy.outputs.deployed }}
       deployment_url:
-        description: 'Primary deployment URL returned by wrangler-action.'
+        description: "Primary deployment URL returned by wrangler-action."
         value: ${{ jobs.deploy.outputs.deployment_url }}
       deployment_id:
-        description: 'Cloudflare Pages deployment ID.'
+        description: "Cloudflare Pages deployment ID."
         value: ${{ jobs.deploy.outputs.deployment_id }}
       deployment_alias_url:
-        description: 'Pages deployment alias URL (set on preview/branch deploys).'
+        description: "Pages deployment alias URL (set on preview/branch deploys)."
         value: ${{ jobs.deploy.outputs.deployment_alias_url }}
       environment:
-        description: 'Cloudflare Pages environment (`production` or `preview`).'
+        description: "Cloudflare Pages environment (`production` or `preview`)."
         value: ${{ jobs.deploy.outputs.environment }}
       account_id:
         description: >-
-          Resolved Cloudflare account ID. Sourced from
-          `vars.CLOUDFLARE_ACCOUNT_ID` when set, otherwise
-          `secrets.CLOUDFLARE_ACCOUNT_ID` (back-compat), otherwise
-          auto-resolved via `GET /accounts`. When sourced from a
-          secret (back-compat path) the runner auto-masks it and this
-          output arrives **empty** in downstream jobs reading
-          `needs.<job>.outputs.account_id` — migrate to
-          `vars.CLOUDFLARE_ACCOUNT_ID` to fix.
+          Resolved Cloudflare account ID. Prefer `vars.CLOUDFLARE_ACCOUNT_ID`
+          when set; otherwise use the secret override if provided, or
+          auto-resolve via `GET /accounts`. When sourced from a secret,
+          the runner auto-masks it and this output can arrive empty in
+          downstream jobs reading `needs.<job>.outputs.account_id`.
         value: ${{ jobs.deploy.outputs.account_id }}
       purged:
-        description: '`true` when the post-deploy zone cache purge ran successfully; `false` when skipped or failed.'
+        description: "`true` when the post-deploy zone cache purge ran successfully; `false` when skipped or failed."
         value: ${{ jobs.deploy.outputs.purged }}
       ai_bindings:
         description: >-
@@ -544,7 +566,7 @@ jobs:
     timeout-minutes: 30
     environment: ${{ inputs.deployment_environment }}
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       # Hoist inputs that several steps read so they live in one place
       # and never get expanded inline inside `run:` bodies.
       PROJECT_NAME: ${{ inputs.cloudflare_project_name }}
@@ -558,12 +580,11 @@ jobs:
       WRANGLER_VERSION: ${{ inputs.wrangler_version }}
       # Cloudflare account/zone IDs: prefer `vars.*` (public identifiers,
       # no runner masking, can flow through `GITHUB_OUTPUT` to downstream
-      # jobs); fall back to `secrets.*` for back-compat with callers who
-      # provisioned them as secrets before the vars-first convention.
+      # jobs); use `secrets.*` only when explicitly configured.
       # Secrets get auto-masked by the runner — validation still works,
-      # but `needs.<job>.outputs.account_id` will arrive empty.
+      # but `needs.<job>.outputs.account_id` may arrive empty.
       ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || secrets.CLOUDFLARE_ACCOUNT_ID }}
-      ZONE_ID:    ${{ vars.CLOUDFLARE_ZONE_ID    || secrets.CLOUDFLARE_ZONE_ID }}
+      ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID    || secrets.CLOUDFLARE_ZONE_ID }}
     outputs:
       deployed: ${{ steps.gate.outputs.deploy }}
       deployment_url: ${{ steps.deploy.outputs.deployment-url }}
@@ -589,10 +610,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '22'   # current LTS; wrangler 4 supports 18/20/22
+          node-version: "22" # current LTS; wrangler 4 supports 18/20/22
 
       # Account ID resolution: prefer the inherited `env.ACCOUNT_ID`
-      # (set from `vars.*` or back-compat `secrets.*` at the job level).
+      # (set from `vars.*` or a configured secret at the job level).
       # When neither is set, look the account up via `GET /accounts`.
       - name: Auto-resolve Cloudflare account ID
         id: account_autoresolve
@@ -971,12 +992,38 @@ jobs:
       # them together with the rest of the actions in this repo.
       # ──────────────────────────────────────────────────────────────
 
+      # Org-wide audit policy for the site generators (sitemap, robots.txt,
+      # security.txt, web app manifest).
+      # Sparse-checked-out next to the deploy tree so the generators can
+      # merge it beneath any repository-level config the consumer ships.
+      - name: Checkout generator audit policy
+        if: inputs.generator_audit && (inputs.generate_sitemap || inputs.generate_security_txt || inputs.generate_robots || inputs.generate_manifest)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: blackoutsecure/bos-automation-hub
+          ref: main
+          path: hub-generator-config
+          persist-credentials: false
+          sparse-checkout: |
+            sync-files/config/sitemap-generator-global-config.json
+            sync-files/config/securitytxt-generator-global-config.json
+            sync-files/config/robotstxt-generator-global-config.json
+            sync-files/config/web-manifest-generator-global-config.json
+          sparse-checkout-cone-mode: false
+
       - name: Generate sitemap
         if: inputs.generate_sitemap
         uses: blackoutsecure/bos-sitemap-generator@fee1be2a6770cd2ee4b6424ccb67ab1ff6bf554a # v1.0.2
         with:
           site_url: ${{ inputs.site_url }}
           public_dir: ${{ inputs.deploy_dir }}
+          enable_audit: ${{ inputs.generator_audit }}
+          use_global_config: ${{ inputs.generator_audit && 'true' || 'false' }}
+          global_config_path: hub-generator-config/sync-files/config/sitemap-generator-global-config.json
+          audit_fail_on: ${{ inputs.generator_audit && inputs.generator_audit_fail_on || '' }}
+          sarif_output: ${{ inputs.generator_audit && 'generator-audit/sitemap-audit.sarif' || '' }}
+          report_json: ${{ inputs.generator_audit && 'generator-audit/sitemap-audit.json' || '' }}
+          recommendations_json: ${{ inputs.generator_audit && 'generator-audit/sitemap-recommendations.json' || '' }}
 
       - name: Generate Web App Manifest
         if: inputs.generate_manifest
@@ -993,10 +1040,17 @@ jobs:
           categories: ${{ inputs.manifest_categories }}
           public_dir: ${{ inputs.deploy_dir }}
           icons_dir: ${{ inputs.manifest_icons_dir }}
+          enable_audit: ${{ inputs.generator_audit }}
+          use_global_config: ${{ inputs.generator_audit && 'true' || 'false' }}
+          global_config_path: hub-generator-config/sync-files/config/web-manifest-generator-global-config.json
+          audit_fail_on: ${{ inputs.generator_audit && inputs.generator_audit_fail_on || '' }}
+          sarif_output: ${{ inputs.generator_audit && 'generator-audit/web-manifest-audit.sarif' || '' }}
+          report_json: ${{ inputs.generator_audit && 'generator-audit/web-manifest-audit.json' || '' }}
+          recommendations_json: ${{ inputs.generator_audit && 'generator-audit/web-manifest-recommendations.json' || '' }}
 
       - name: Generate _redirects
         if: inputs.generate_redirects
-        uses: blackoutsecure/bos-automation-hub/.github/actions/cf-pages-redirects-generate@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/cf-pages-redirects-generate@main
         with:
           output_dir: ${{ inputs.deploy_dir }}
           site_url: ${{ inputs.site_url }}
@@ -1009,6 +1063,13 @@ jobs:
         with:
           site_url: ${{ inputs.site_url }}
           public_dir: ${{ inputs.deploy_dir }}
+          enable_audit: ${{ inputs.generator_audit }}
+          use_global_config: ${{ inputs.generator_audit && 'true' || 'false' }}
+          global_config_path: hub-generator-config/sync-files/config/robotstxt-generator-global-config.json
+          audit_fail_on: ${{ inputs.generator_audit && inputs.generator_audit_fail_on || '' }}
+          sarif_output: ${{ inputs.generator_audit && 'generator-audit/robotstxt-audit.sarif' || '' }}
+          report_json: ${{ inputs.generator_audit && 'generator-audit/robotstxt-audit.json' || '' }}
+          recommendations_json: ${{ inputs.generator_audit && 'generator-audit/robotstxt-recommendations.json' || '' }}
 
       - name: Generate security.txt
         if: inputs.generate_security_txt
@@ -1017,7 +1078,18 @@ jobs:
           security_contact: ${{ inputs.security_contact }}
           site_url: ${{ inputs.site_url }}
           public_dir: ${{ inputs.deploy_dir }}
+          enable_audit: ${{ inputs.generator_audit }}
+          use_global_config: ${{ inputs.generator_audit && 'true' || 'false' }}
+          global_config_path: hub-generator-config/sync-files/config/securitytxt-generator-global-config.json
+          audit_fail_on: ${{ inputs.generator_audit && inputs.generator_audit_fail_on || '' }}
+          sarif_output: ${{ inputs.generator_audit && 'generator-audit/securitytxt-audit.sarif' || '' }}
+          report_json: ${{ inputs.generator_audit && 'generator-audit/securitytxt-audit.json' || '' }}
+          recommendations_json: ${{ inputs.generator_audit && 'generator-audit/securitytxt-recommendations.json' || '' }}
 
+      # Emits humanstxt.org-standard field names under the standard TEAM,
+      # THANKS, and SITE banners so the file satisfies the same controls
+      # `bos-humanstxt-generator` audits. Swap this block for that action
+      # once it publishes a taggable release the pin bumper can track.
       - name: Generate humans.txt
         if: inputs.generate_humans_txt
         env:
@@ -1031,24 +1103,31 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "${DEPLOY_DIR}"
+          last_update="$(date -u +'%Y/%m/%d')"
           generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           repo_url="${SERVER_URL}/${REPO}"
           run_url="${repo_url}/actions/runs/${RUN_ID}"
           site_url="${SITE_URL:-${repo_url}}"
 
           cat > "${DEPLOY_DIR}/humans.txt" <<EOF
+          /* HUMANS.TXT */
+          /* humanstxt.org */
+
           /* TEAM */
-          Organization: ${OWNER}
-          Repository: ${repo_url}
+            Name: ${OWNER}
+            Title: Maintainers
+            Contact: ${repo_url}
+
+          /* THANKS */
+            Blackout Secure Launchpad
+            ${repo_url}
 
           /* SITE */
-          Site: ${site_url}
-          Build run: ${run_url}
-          Generated (UTC): ${generated_at}
-          Standards: HTML5, CSS3
-
-          /* NOTES */
-          This file is generated by Blackout Secure Launchpad during publish.
+            Last update: ${last_update}
+            Standards: HTML5, CSS3
+            Site: ${site_url}
+            Build: ${run_url}
+            Generated: ${generated_at}
           EOF
 
       # Hub-local composite action — not pinned because it lives in the
@@ -1057,7 +1136,7 @@ jobs:
       # generator-emitted asset is in place.
       - name: Generate _headers
         if: inputs.generate_headers
-        uses: blackoutsecure/bos-automation-hub/.github/actions/cf-pages-headers-generate@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/cf-pages-headers-generate@main
         with:
           output_dir: ${{ inputs.deploy_dir }}
           presets: ${{ inputs.headers_presets }}
@@ -1073,6 +1152,18 @@ jobs:
           common_sitemap_xml_cache_control: ${{ inputs.common_sitemap_xml_cache_control }}
           common_humans_txt_cache_control: ${{ inputs.common_humans_txt_cache_control }}
           custom_rules: ${{ inputs.headers_custom_rules }}
+
+      # Audit reports live outside `deploy_dir`, so they are collected as a
+      # build artifact rather than published with the site.
+      - name: Upload generator audit reports
+        if: inputs.generator_audit && always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ inputs.generator_audit_artifact_name }}
+          path: generator-audit/
+          if-no-files-found: ignore
+          retention-days: 30
+
           replace_existing: ${{ inputs.headers_replace_existing }}
 
       # ──────────────────────────────────────────────────────────────
@@ -1228,7 +1319,7 @@ jobs:
       - name: Compose wrangler command
         id: cmd
         if: steps.gate.outputs.deploy == 'true'
-        uses: blackoutsecure/bos-automation-hub/.github/actions/cloudflare-pages-compose-command@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/cloudflare-pages-compose-command@main
         with:
           deploy_dir: ${{ inputs.deploy_dir }}
           project_name: ${{ inputs.cloudflare_project_name }}
@@ -1297,7 +1388,7 @@ jobs:
       - name: Purge Cloudflare zone cache
         id: purge
         if: steps.purge_gate.outputs.purge == 'true'
-        uses: blackoutsecure/bos-automation-hub/.github/actions/cloudflare-zone-purge@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/cloudflare-zone-purge@main
         with:
           zone_id: ${{ env.ZONE_ID }}
           site_url: ${{ inputs.site_url }}

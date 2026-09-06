@@ -1,0 +1,95 @@
+name: "Automation App Token"
+description: >-
+  Mint a short-lived GitHub App installation token for a single automation
+  purpose. Centralizes the create-github-app-token pattern so consumer and
+  hub workflows stop threading long-lived PATs through inputs, and so retiring
+  a PAT fallback is a one-line change instead of a repeated one.
+inputs:
+  app_id:
+    description: >-
+      Variable holding the GitHub App ID (e.g. `vars.GATEWALL_APP_ID`). Empty
+      skips minting and the action reports `has_token: false` so the caller
+      can fall back to a PAT or `github.token`.
+    required: false
+    default: ""
+  private_key:
+    description: Secret holding the GitHub App private key (PEM).
+    required: false
+    default: ""
+  owner:
+    description: >-
+      Organization/user that owns the App installation. Defaults to the
+      current repository owner.
+    required: false
+    default: ${{ github.repository_owner }}
+  repositories:
+    description: >-
+      Space or newline-separated repository names (without owner) to scope
+      the token to. Empty mints a token scoped to every repository the App
+      installation can access — prefer setting this explicitly.
+    required: false
+    default: ""
+  permission_actions:
+    description: Optional Actions token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_administration:
+    description: Optional repository Administration token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_contents:
+    description: Optional repository Contents token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_members:
+    description: Optional organization Members token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_pull_requests:
+    description: Optional Pull requests token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_secret_scanning_alerts:
+    description: Optional Secret scanning alerts token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_security_events:
+    description: Optional Security events token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_vulnerability_alerts:
+    description: Optional Dependabot alerts token permission (`read` or `write`).
+    required: false
+    default: ""
+  permission_workflows:
+    description: Optional Workflows token permission (`write`).
+    required: false
+    default: ""
+outputs:
+  token:
+    description: Installation access token, or empty when app_id/private_key were not supplied.
+    value: ${{ steps.mint.outputs.token || '' }}
+  has_token:
+    description: "'true' when a token was minted, 'false' when the caller must fall back."
+    value: ${{ steps.mint.outcome == 'success' && steps.mint.outputs.token != '' && 'true' || 'false' }}
+runs:
+  using: composite
+  steps:
+    - name: Mint installation token
+      id: mint
+      if: inputs.app_id != '' && inputs.private_key != ''
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      with:
+        app-id: ${{ inputs.app_id }}
+        private-key: ${{ inputs.private_key }}
+        owner: ${{ inputs.owner }}
+        repositories: ${{ inputs.repositories }}
+        permission-actions: ${{ inputs.permission_actions }}
+        permission-administration: ${{ inputs.permission_administration }}
+        permission-contents: ${{ inputs.permission_contents }}
+        permission-members: ${{ inputs.permission_members }}
+        permission-pull-requests: ${{ inputs.permission_pull_requests }}
+        permission-secret-scanning-alerts: ${{ inputs.permission_secret_scanning_alerts }}
+        permission-security-events: ${{ inputs.permission_security_events }}
+        permission-vulnerability-alerts: ${{ inputs.permission_vulnerability_alerts }}
+        permission-workflows: ${{ inputs.permission_workflows }}

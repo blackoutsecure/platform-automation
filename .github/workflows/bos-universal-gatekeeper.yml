@@ -74,19 +74,19 @@
 #     monitor ran on. It is **not** reachable in static-site mode (no tag
 #     to resolve) — for tag-driven container releases without upstream
 #     polling, call `release.yml` directly instead.
-name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
+name: "[RUNTIME] Blackout Secure Universal Gatekeeper"
 
 "on":
   workflow_call:
     inputs:
       # ----- Monitor stage --------------------------------------------------
       upstream_repo:
-        description: 'Upstream GitHub repo, as `owner/name`. Required for `source: github_release`, `github_branch_file`, and `github_tags`.'
+        description: "Upstream GitHub repo, as `owner/name`. Required for `source: github_release`, `github_branch_file`, and `github_tags`."
         required: false
         type: string
-        default: ''
+        default: ""
       track_file:
-        description: 'Repo-relative path to the tracking JSON file.'
+        description: "Repo-relative path to the tracking JSON file."
         required: false
         type: string
         default: .github/tracked-release.json
@@ -115,40 +115,40 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           that mode, ignored otherwise.
         required: false
         type: string
-        default: ''
+        default: ""
       version_file_path:
         description: >-
           Repo-relative path to the version file inside `upstream_branch`.
           Used only when `source: github_branch_file`. Default `version`.
         required: false
         type: string
-        default: 'version'
+        default: "version"
       image_ref:
         description: >-
           Container image reference (e.g. `docker.io/library/nginx`).
           Required when `source: container_image`.
         required: false
         type: string
-        default: ''
+        default: ""
       package_name:
         description: >-
           Package name. Required when `source: npm` (scoped names allowed)
           or `source: pypi`.
         required: false
         type: string
-        default: ''
+        default: ""
       version_url:
-        description: 'URL to fetch when `source: generic_url`.'
+        description: "URL to fetch when `source: generic_url`."
         required: false
         type: string
-        default: ''
+        default: ""
       version_regex:
         description: >-
           Regex applied to `version_url` body; first capture group is the
           version. Required when `source: generic_url`.
         required: false
         type: string
-        default: ''
+        default: ""
       tag_pattern:
         description: >-
           Optional regex used to filter candidate tags for `github_tags` and
@@ -156,7 +156,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `[v]X.Y.Z[-suffix]`.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Release pipeline: stage toggles -------------------------------
       # Policy: every stage toggle defaults to `false`. Callers must
@@ -166,42 +166,42 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
       # runs the stages it asks for today, even if we add five more stages
       # tomorrow.
       docker:
-        description: 'Run the docker-build-push stage. Default `false` — opt in explicitly.'
+        description: "Run the docker-build-push stage. Default `false` — opt in explicitly."
         required: false
         type: boolean
         default: false
       balena:
-        description: 'Run the balena-block-publish stage. Default `false` — opt in explicitly.'
+        description: "Run the balena-block-publish stage. Default `false` — opt in explicitly."
         required: false
         type: boolean
         default: false
       github_release:
-        description: 'Run the github-release publish stage. Default `false` — opt in explicitly.'
+        description: "Run the github-release publish stage. Default `false` — opt in explicitly."
         required: false
         type: boolean
         default: false
       companion_docker:
-        description: 'Run the companion docker-build-push stage. Default `false` — opt in explicitly.'
+        description: "Run the companion docker-build-push stage. Default `false` — opt in explicitly."
         required: false
         type: boolean
         default: false
 
       # ----- Release pipeline: Docker stage --------------------------------
       image_name:
-        description: 'Docker image name (no namespace). Required when `docker: true`.'
+        description: "Docker image name (no namespace). Required when `docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       dockerhub_namespace:
-        description: 'Docker Hub namespace. Required when `docker: true`.'
+        description: "Docker Hub namespace. Required when `docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_extra_tags:
-        description: 'Newline-separated extra tags applied to the manifest.'
+        description: "Newline-separated extra tags applied to the manifest."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_short_description:
         description: >-
           Docker Hub short description (<=100 chars). Values longer than
@@ -210,19 +210,19 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           leaves it untouched.
         required: false
         type: string
-        default: ''
+        default: ""
       docker_latest:
-        description: 'Also tag :latest when pushing.'
+        description: "Also tag :latest when pushing."
         required: false
         type: boolean
         default: true
       docker_multi_arch:
-        description: 'Build linux/amd64 + linux/arm64.'
+        description: "Build linux/amd64 + linux/arm64."
         required: false
         type: boolean
         default: true
       docker_update_description:
-        description: 'Sync the README + short description to Docker Hub after a successful push.'
+        description: "Sync the README + short description to Docker Hub after a successful push."
         required: false
         type: boolean
         default: true
@@ -237,15 +237,15 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
         type: boolean
         default: false
       companion_image_name:
-        description: 'Companion Docker image name (no namespace). Required when `companion_docker: true`.'
+        description: "Companion Docker image name (no namespace). Required when `companion_docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       companion_build_target:
-        description: 'Optional Dockerfile stage target for the companion image build.'
+        description: "Optional Dockerfile stage target for the companion image build."
         required: false
         type: string
-        default: ''
+        default: ""
       companion_docker_short_description:
         description: >-
           Docker Hub short description for the companion image (<=100
@@ -253,51 +253,51 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           + `…` with a `::warning::`. Empty leaves it untouched.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Release pipeline: Docker Scout (forwarded to release.yml) -----
       docker_enable_scout:
-        description: 'Run Docker Scout against the published image.'
+        description: "Run Docker Scout against the published image."
         required: false
         type: boolean
         default: true
       docker_scout_command:
-        description: 'Scout command (default `cves`). Comma-separated for multiple.'
+        description: "Scout command (default `cves`). Comma-separated for multiple."
         required: false
         type: string
         default: cves
       docker_scout_severities:
-        description: 'Severities to keep.'
+        description: "Severities to keep."
         required: false
         type: string
-        default: 'critical,high'
+        default: "critical,high"
       docker_scout_only_fixed:
-        description: 'Filter to CVEs with a fix available.'
+        description: "Filter to CVEs with a fix available."
         required: false
         type: boolean
         default: false
       docker_scout_ignore_base:
-        description: 'Ignore vulnerabilities inherited from the base image.'
+        description: "Ignore vulnerabilities inherited from the base image."
         required: false
         type: boolean
         default: false
       docker_scout_organization:
-        description: 'Scout organization (Docker Hub namespace).'
+        description: "Scout organization (Docker Hub namespace)."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_scout_record_environment:
-        description: 'Scout environment to record the image into (e.g. `production`).'
+        description: "Scout environment to record the image into (e.g. `production`)."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_scout_sarif_upload:
-        description: 'Upload the SARIF report to GitHub code scanning.'
+        description: "Upload the SARIF report to GitHub code scanning."
         required: false
         type: boolean
         default: true
       docker_scout_exit_code:
-        description: 'Fail the Docker stage if Scout finds matching vulnerabilities.'
+        description: "Fail the Docker stage if Scout finds matching vulnerabilities."
         required: false
         type: boolean
         default: false
@@ -319,19 +319,19 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           the two intentionally diverge.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_namespace:
-        description: 'Balena namespace (user/org). Required when `balena: true`.'
+        description: "Balena namespace (user/org). Required when `balena: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       balena_sync_yml:
-        description: 'Rewrite balena.yml `version:` and commit it back when publishing.'
+        description: "Rewrite balena.yml `version:` and commit it back when publishing."
         required: false
         type: boolean
         default: true
       balena_draft:
-        description: 'Publish as a draft (sets `finalize: false`).'
+        description: "Publish as a draft (sets `finalize: false`)."
         required: false
         type: boolean
         default: false
@@ -368,14 +368,14 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_post_provisioning:
         description: >-
           Rendered `post-provisioning:` Markdown. Multi-line; pass as a
           YAML literal block (`|`). Used only when `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_repository_url:
         description: >-
           `assets.repository.data.url` for the rendered manifest. When
@@ -383,14 +383,14 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_logo_url:
         description: >-
           Optional `assets.logo.data.url`. Must be `https://` when set.
           Used only when `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_default_device_type:
         description: >-
           `data.defaultDeviceType` slug. Optional — when empty, the
@@ -399,7 +399,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_supported_device_types:
         description: >-
           Explicit `data.supportedDeviceTypes` (newline- and/or
@@ -412,7 +412,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Cloudflare Pages stage ----------------------------------------
       # Runs independently of the monitor + release path. Enable for static-
@@ -421,52 +421,52 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
       # are forwarded verbatim to `deploy-cloudflare-pages.yml` — see that
       # workflow's input reference for the full semantics of each field.
       cloudflare_pages:
-        description: 'Run the deploy-cloudflare-pages stage. Default `false` — opt in explicitly.'
+        description: "Run the deploy-cloudflare-pages stage. Default `false` — opt in explicitly."
         required: false
         type: boolean
         default: false
       cloudflare_project_name:
-        description: 'Cloudflare Pages project name. Required when `cloudflare_pages: true`.'
+        description: "Cloudflare Pages project name. Required when `cloudflare_pages: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_deployment_environment:
         description: >-
           Optional GitHub Environment to bind the deploy job to (production
           gates, env-scoped secrets).
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_site_url:
-        description: 'Canonical site URL. Required when any Cloudflare generator is enabled.'
+        description: "Canonical site URL. Required when any Cloudflare generator is enabled."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_public_dir:
-        description: 'Source directory in the caller repo to copy from.'
+        description: "Source directory in the caller repo to copy from."
         required: false
         type: string
-        default: '.'
+        default: "."
       cloudflare_deploy_dir:
-        description: 'Staging directory uploaded to Cloudflare Pages.'
+        description: "Staging directory uploaded to Cloudflare Pages."
         required: false
         type: string
-        default: './dist'
+        default: "./dist"
       cloudflare_clean_deploy_dir:
-        description: 'Remove `cloudflare_deploy_dir` before staging files.'
+        description: "Remove `cloudflare_deploy_dir` before staging files."
         required: false
         type: boolean
         default: true
       cloudflare_copy_files:
-        description: 'Newline-separated files (or globs) under `cloudflare_public_dir` copied into the root of `cloudflare_deploy_dir`.'
+        description: "Newline-separated files (or globs) under `cloudflare_public_dir` copied into the root of `cloudflare_deploy_dir`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_copy_dirs:
-        description: 'Newline-separated `SRC[:DEST]` directory entries copied recursively into `cloudflare_deploy_dir`.'
+        description: "Newline-separated `SRC[:DEST]` directory entries copied recursively into `cloudflare_deploy_dir`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_prebuild_command:
         description: >-
           Optional shell command run before staging (e.g. `npm ci && npm run build`).
@@ -475,32 +475,32 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           repository_dispatch payloads).
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_working_directory:
-        description: 'Working dir for `cloudflare_prebuild_command` and wrangler.'
+        description: "Working dir for `cloudflare_prebuild_command` and wrangler."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_branch:
-        description: 'Override the deploy branch passed to `wrangler pages deploy`.'
+        description: "Override the deploy branch passed to `wrangler pages deploy`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_commit_message:
-        description: 'Override the Pages deploy commit message.'
+        description: "Override the Pages deploy commit message."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_wrangler_version:
-        description: 'Pin wrangler (e.g. `4`, `^4.0.0`, `latest`). Empty uses the action default.'
+        description: "Pin wrangler (e.g. `4`, `^4.0.0`, `latest`). Empty uses the action default."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_extra_wrangler_args:
-        description: 'Extra args appended to `wrangler pages deploy` (newlines = spaces).'
+        description: "Extra args appended to `wrangler pages deploy` (newlines = spaces)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_ai_bindings:
         description: >-
           JSON array of Workers AI binding names to ensure on the Pages
@@ -514,7 +514,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           `CLOUDFLARE_PAGES_ADMIN_TOKEN` secret is provided.
         required: false
         type: string
-        default: '[]'
+        default: "[]"
       cloudflare_deploy_artifact_name:
         description: >-
           When set, the Cloudflare Pages deploy job downloads the named
@@ -529,12 +529,12 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           deploy reusable rejects callers that combine them.
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_deploy:
         description: "`'true'`/`'false'` to force the deploy step. Empty deploys only on default-branch pushes."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_runs_on:
         description: >-
           Optional runner override for the Cloudflare Pages deploy job. Empty
@@ -542,9 +542,9 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           cloudflare-pages workflow for accepted shapes.
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_checkout_fetch_depth:
-        description: '`fetch-depth` passed to `actions/checkout` for the Cloudflare stage.'
+        description: "`fetch-depth` passed to `actions/checkout` for the Cloudflare stage."
         required: false
         type: number
         default: 0
@@ -558,7 +558,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
         type: boolean
         default: true
       cloudflare_generate_sitemap:
-        description: 'Run the Blackout Secure sitemap generator before deploy.'
+        description: "Run the Blackout Secure sitemap generator before deploy."
         required: false
         type: boolean
         default: false
@@ -575,87 +575,87 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           control, `never` keeps the audit advisory.
         required: false
         type: string
-        default: 'never'
+        default: "never"
       cloudflare_generator_audit_artifact_name:
-        description: 'Artifact name for the collected generator audit reports.'
+        description: "Artifact name for the collected generator audit reports."
         required: false
         type: string
-        default: 'site-compliance-reports'
+        default: "site-compliance-reports"
       cloudflare_generate_robots:
-        description: 'Run the Blackout Secure robots.txt generator before deploy.'
+        description: "Run the Blackout Secure robots.txt generator before deploy."
         required: false
         type: boolean
         default: false
       cloudflare_generate_security_txt:
-        description: 'Run the Blackout Secure security.txt generator before deploy.'
+        description: "Run the Blackout Secure security.txt generator before deploy."
         required: false
         type: boolean
         default: false
       cloudflare_generate_humans_txt:
-        description: 'Generate `/humans.txt` dynamically before deploy.'
+        description: "Generate `/humans.txt` dynamically before deploy."
         required: false
         type: boolean
         default: false
       cloudflare_security_contact:
-        description: '`Contact:` value written to `/.well-known/security.txt`. Required when `cloudflare_generate_security_txt: true`.'
+        description: "`Contact:` value written to `/.well-known/security.txt`. Required when `cloudflare_generate_security_txt: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_generate_manifest:
-        description: 'Run the Blackout Secure Web App Manifest generator before deploy.'
+        description: "Run the Blackout Secure Web App Manifest generator before deploy."
         required: false
         type: boolean
         default: false
       cloudflare_manifest_name:
-        description: 'PWA manifest `name`. Required when `cloudflare_generate_manifest: true`.'
+        description: "PWA manifest `name`. Required when `cloudflare_generate_manifest: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_short_name:
-        description: 'PWA manifest `short_name`.'
+        description: "PWA manifest `short_name`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_description:
-        description: 'PWA manifest `description`.'
+        description: "PWA manifest `description`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_orientation:
-        description: 'PWA manifest `orientation`.'
+        description: "PWA manifest `orientation`."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_theme_color:
-        description: 'PWA manifest `theme_color` (CSS hex).'
+        description: "PWA manifest `theme_color` (CSS hex)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_background_color:
-        description: 'PWA manifest `background_color` (CSS hex).'
+        description: "PWA manifest `background_color` (CSS hex)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_lang:
-        description: 'PWA manifest `lang` (BCP 47 tag).'
+        description: "PWA manifest `lang` (BCP 47 tag)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_dir:
-        description: 'PWA manifest `dir` (`ltr`/`rtl`/`auto`).'
+        description: "PWA manifest `dir` (`ltr`/`rtl`/`auto`)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_categories:
-        description: 'PWA manifest `categories` (comma-separated).'
+        description: "PWA manifest `categories` (comma-separated)."
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_manifest_icons_dir:
-        description: 'Directory inside `cloudflare_deploy_dir` to scan for icons (e.g. `/assets/`).'
+        description: "Directory inside `cloudflare_deploy_dir` to scan for icons (e.g. `/assets/`)."
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- _redirects generator (hub-local composite action) ----------
       cloudflare_generate_redirects:
@@ -674,7 +674,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           doesn't abstract away.
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_redirects_replace_existing:
         description: >-
           When `false` (default), the generator fails if a `_redirects`
@@ -703,45 +703,45 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           Default `security,cache`.
         required: false
         type: string
-        default: 'security,cache'
+        default: "security,cache"
       cloudflare_headers_csp:
         description: >-
           Optional `Content-Security-Policy` value. Appended to the
           security preset's `/*` block. Single-line only.
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_headers_hsts_max_age:
         description: >-
           `Strict-Transport-Security` max-age in seconds. Default
           `63072000` (2 years). Set to `0` to suppress HSTS.
         required: false
         type: string
-        default: '63072000'
+        default: "63072000"
       cloudflare_headers_permissions_policy:
         description: >-
           `Permissions-Policy` value. Defaults to a safe denylist for
           static sites. Set empty to omit.
         required: false
         type: string
-        default: 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
+        default: "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
       cloudflare_headers_cache_html_control:
-        description: '`Cache-Control` value applied to `/*` by the `cache` preset.'
+        description: "`Cache-Control` value applied to `/*` by the `cache` preset."
         required: false
         type: string
-        default: 'public, max-age=0, must-revalidate'
+        default: "public, max-age=0, must-revalidate"
       cloudflare_headers_cache_assets_pattern:
         description: >-
           Path pattern for the long-cache rule emitted by the `cache`
           preset. Default `/assets/*`.
         required: false
         type: string
-        default: '/assets/*'
+        default: "/assets/*"
       cloudflare_headers_cache_assets_control:
-        description: '`Cache-Control` value applied to `cloudflare_headers_cache_assets_pattern`.'
+        description: "`Cache-Control` value applied to `cloudflare_headers_cache_assets_pattern`."
         required: false
         type: string
-        default: 'public, max-age=31536000, immutable'
+        default: "public, max-age=31536000, immutable"
       cloudflare_generate_common_content_headers:
         description: >-
           Automatically emit common content headers for staged files
@@ -750,32 +750,32 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
         type: boolean
         default: true
       cloudflare_common_security_txt_cache_control:
-        description: '`Cache-Control` value for `/.well-known/security.txt`.'
+        description: "`Cache-Control` value for `/.well-known/security.txt`."
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       cloudflare_common_robots_txt_cache_control:
-        description: '`Cache-Control` value for `/robots.txt`.'
+        description: "`Cache-Control` value for `/robots.txt`."
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       cloudflare_common_sitemap_xml_cache_control:
-        description: '`Cache-Control` value for `/sitemap.xml`.'
+        description: "`Cache-Control` value for `/sitemap.xml`."
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       cloudflare_common_humans_txt_cache_control:
-        description: '`Cache-Control` value for `/humans.txt`.'
+        description: "`Cache-Control` value for `/humans.txt`."
         required: false
         type: string
-        default: 'public, max-age=86400'
+        default: "public, max-age=86400"
       cloudflare_headers_custom_rules:
         description: >-
           Raw `_headers` content appended verbatim AFTER preset
           blocks. Use for per-site rules the presets don't cover.
         required: false
         type: string
-        default: ''
+        default: ""
       cloudflare_headers_replace_existing:
         description: >-
           When `false` (default), the generator fails if a `_headers`
@@ -797,10 +797,10 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
 
       # ----- Release pipeline: GitHub Release stage ------------------------
       release_template_path:
-        description: 'Path to a Markdown template inside the caller repo.'
+        description: "Path to a Markdown template inside the caller repo."
         required: false
         type: string
-        default: ''
+        default: ""
       release_extra_context:
         description: >-
           Newline-separated `KEY=VALUE` pairs interpolated into the release
@@ -809,19 +809,19 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           available to the template even if you pass nothing here.
         required: false
         type: string
-        default: ''
+        default: ""
       generate_release_notes:
         description: "Append GitHub's auto-generated PR/contributor notes after the rendered body."
         required: false
         type: boolean
         default: true
       release_files:
-        description: 'Newline-separated globs of artifacts to attach to the release.'
+        description: "Newline-separated globs of artifacts to attach to the release."
         required: false
         type: string
-        default: ''
+        default: ""
       release_draft:
-        description: 'Create the release as a draft.'
+        description: "Create the release as a draft."
         required: false
         type: boolean
         default: false
@@ -880,37 +880,37 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
       # Docker Scout SARIF upload — so this requirement happens to be
       # met by the existing perm block, but it is not redundant.
       enable_security_scan:
-        description: 'Enable consolidated security scanning (kit composite + CodeQL) via the launchpad. Default `false`. NOTE: caller MUST grant `security-events: write` + `actions: read` at workflow level UNCONDITIONALLY (even when this input is `false`) — GitHub validates the nested `security_scan` job''s permission cascade statically, before the `if:` gate.'
+        description: "Enable consolidated security scanning (kit composite + CodeQL) via the launchpad. Default `false`. NOTE: caller MUST grant `security-events: write` + `actions: read` at workflow level UNCONDITIONALLY (even when this input is `false`) — GitHub validates the nested `security_scan` job's permission cascade statically, before the `if:` gate."
         required: false
         type: boolean
         default: false
       security_scan_fail_on:
-        description: 'Forwarded to the kit `fail_on`. `fail` (default, matches Marketplace launchpad + kit default) marks the security_scan job failed on error-level findings; combined with `security_scan_blocks_release: true` this skips the release. `never` collects findings without failing the job.'
+        description: "Forwarded to the kit `fail_on`. `fail` (default, matches Marketplace launchpad + kit default) marks the security_scan job failed on error-level findings; combined with `security_scan_blocks_release: true` this skips the release. `never` collects findings without failing the job."
         required: false
         type: string
         default: fail
       security_scan_blocks_release:
-        description: 'When `true` (default), the `release` and `cloudflare-pages` jobs `needs:` the security_scan job AND skip themselves unless it succeeded or was disabled. Set `false` to keep the pre-Nov 2026 advisory model (scan runs in parallel, deploy never waits or gates).'
+        description: "When `true` (default), the `release` and `cloudflare-pages` jobs `needs:` the security_scan job AND skip themselves unless it succeeded or was disabled. Set `false` to keep the pre-Nov 2026 advisory model (scan runs in parallel, deploy never waits or gates)."
         required: false
         type: boolean
         default: true
       security_scan_enable_kit_composite:
-        description: 'Run the published `bos-code-scanning-kit@v1` composite sub-job inside the wrapper. Default `true`. Set `false` for CodeQL-only mode.'
+        description: "Run the published `bos-code-scanning-kit@v1` composite sub-job inside the wrapper. Default `true`. Set `false` for CodeQL-only mode."
         required: false
         type: boolean
         default: true
       security_scan_enable_posture:
-        description: 'Forwarded to the kit. Run the posture audit step. Default `true`. Ignored when `security_scan_enable_kit_composite: false`.'
+        description: "Forwarded to the kit. Run the posture audit step. Default `true`. Ignored when `security_scan_enable_kit_composite: false`."
         required: false
         type: boolean
         default: true
       security_scan_enable_scanners:
-        description: 'Forwarded to the kit. Run the bundled scanners (actionlint / gitleaks / shellcheck). Default `true`. Ignored when `security_scan_enable_kit_composite: false`.'
+        description: "Forwarded to the kit. Run the bundled scanners (actionlint / gitleaks / shellcheck). Default `true`. Ignored when `security_scan_enable_kit_composite: false`."
         required: false
         type: boolean
         default: true
       security_scan_enable_upload:
-        description: 'Forwarded to the kit. Upload merged SARIF to GHAS. Default `true`. Ignored when `security_scan_enable_kit_composite: false`.'
+        description: "Forwarded to the kit. Upload merged SARIF to GHAS. Default `true`. Ignored when `security_scan_enable_kit_composite: false`."
         required: false
         type: boolean
         default: true
@@ -936,9 +936,9 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
              is REJECTED by `fromJSON`.
         required: false
         type: string
-        default: ''
+        default: ""
       security_scan_codeql_queries:
-        description: 'CodeQL query suite. `security-and-quality` (default), `security-extended`, or `security`. Ignored when `security_scan_codeql_languages` is empty.'
+        description: "CodeQL query suite. `security-and-quality` (default), `security-extended`, or `security`. Ignored when `security_scan_codeql_languages` is empty."
         required: false
         type: string
         default: security-and-quality
@@ -959,7 +959,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           (`["self-hosted","Linux","X64"]`).
         required: false
         type: string
-        default: ''
+        default: ""
       security_scan_use_advanced_pat:
         description: >-
           Forwarded to the kit composite as `use_advanced_pat`. When `true`
@@ -1002,31 +1002,31 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           README. Empty (default) defers to `repo_metadata_ai_enabled`.
         required: false
         type: string
-        default: ''
+        default: ""
       repo_metadata_description_mode:
-        description: '`auto` uses AI then README; `fallback` skips AI; `existing` leaves the description unchanged.'
+        description: "`auto` uses AI then README; `fallback` skips AI; `existing` leaves the description unchanged."
         required: false
         type: string
         default: auto
       repo_metadata_description_fallback:
-        description: 'Deterministic description used by fallback mode.'
+        description: "Deterministic description used by fallback mode."
         required: false
         type: string
-        default: ''
+        default: ""
       repo_metadata_homepage:
         description: >-
           Explicit Website URL for the About box. Empty (default) leaves
           the existing homepage unchanged. Pass `__unset__` to clear it.
         required: false
         type: string
-        default: ''
+        default: ""
       repo_metadata_topics:
         description: >-
           Explicit topics, space- or comma-separated. When non-empty it
           wins over AI. Sanitised + clamped to 20 by the composite.
         required: false
         type: string
-        default: ''
+        default: ""
       repo_metadata_generate_topics:
         description: >-
           Ask GitHub Models to derive topics from the README when
@@ -1040,7 +1040,7 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           AI request fails. Empty (default) means "do nothing on failure".
         required: false
         type: string
-        default: ''
+        default: ""
       repo_metadata_ai_enabled:
         description: >-
           Call GitHub Models for description / topic generation. Default
@@ -1051,22 +1051,22 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
         type: boolean
         default: true
       repo_metadata_ai_model:
-        description: 'GitHub Models model id. Only used when `repo_metadata_ai_enabled: true`.'
+        description: "GitHub Models model id. Only used when `repo_metadata_ai_enabled: true`."
         required: false
         type: string
         default: auto
       repo_metadata_show_releases:
-        description: 'Include the Releases sidebar widget on the repo home page. Default `true`.'
+        description: "Include the Releases sidebar widget on the repo home page. Default `true`."
         required: false
         type: boolean
         default: true
       repo_metadata_show_deployments:
-        description: 'Include the Deployments sidebar widget on the repo home page. Default `false`.'
+        description: "Include the Deployments sidebar widget on the repo home page. Default `false`."
         required: false
         type: boolean
         default: false
       repo_metadata_show_packages:
-        description: 'Include the Packages sidebar widget on the repo home page. Default `false`.'
+        description: "Include the Packages sidebar widget on the repo home page. Default `false`."
         required: false
         type: boolean
         default: false
@@ -1080,20 +1080,20 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
 
       # ----- Shared / advanced ---------------------------------------------
       platforms:
-        description: 'Platform list reported in release notes.'
+        description: "Platform list reported in release notes."
         required: false
         type: string
-        default: 'linux/amd64,linux/arm64'
+        default: "linux/amd64,linux/arm64"
 
     secrets:
       DOCKERHUB_USERNAME:
-        description: 'Docker Hub username. Required when `docker: true`.'
+        description: "Docker Hub username. Required when `docker: true`."
         required: false
       DOCKERHUB_TOKEN:
-        description: 'Docker Hub access token. Required when `docker: true`.'
+        description: "Docker Hub access token. Required when `docker: true`."
         required: false
       BALENA_API_TOKEN:
-        description: 'balenaCloud API token. Required when `balena: true`.'
+        description: "balenaCloud API token. Required when `balena: true`."
         required: false
       CLOUDFLARE_API_TOKEN:
         description: >-
@@ -1143,6 +1143,9 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
           **private** repo outside the caller. See that workflow for scope
           details. Falls back to `GITHUB_TOKEN`.
         required: false
+      GATEWALL_APP_PRIVATE_KEY:
+        description: Private key for the reusable Gatewall automation GitHub App.
+        required: false
       SCANNING_PAT:
         description: >-
           Optional PAT forwarded to the consolidated security-scan stage's
@@ -1190,49 +1193,49 @@ name: '[RUNTIME] Blackout Secure Universal Gatekeeper'
 
     outputs:
       changed:
-        description: '`true` when the upstream version differed from the tracked file. Empty when the monitor stage was skipped (no `upstream_repo`).'
+        description: "`true` when the upstream version differed from the tracked file. Empty when the monitor stage was skipped (no `upstream_repo`)."
         value: ${{ jobs.monitor.outputs.changed }}
       upstream_version:
-        description: 'Latest upstream version (with `v` stripped). Empty when the monitor stage was skipped.'
+        description: "Latest upstream version (with `v` stripped). Empty when the monitor stage was skipped."
         value: ${{ jobs.monitor.outputs.upstream_version }}
       upstream_tag:
-        description: 'Raw upstream tag name. Empty when the monitor stage was skipped.'
+        description: "Raw upstream tag name. Empty when the monitor stage was skipped."
         value: ${{ jobs.monitor.outputs.upstream_tag }}
       upstream_commit:
-        description: 'Resolved upstream commit SHA at the release tag. Empty when the monitor stage was skipped.'
+        description: "Resolved upstream commit SHA at the release tag. Empty when the monitor stage was skipped."
         value: ${{ jobs.monitor.outputs.upstream_commit }}
       tag_name:
-        description: 'Resolved release tag (with `v` prefix). Empty when the release stage was skipped.'
+        description: "Resolved release tag (with `v` prefix). Empty when the release stage was skipped."
         value: ${{ jobs.release.outputs.tag_name }}
       version:
-        description: 'Resolved version (tag with leading `v` stripped). Empty when the release stage was skipped.'
+        description: "Resolved version (tag with leading `v` stripped). Empty when the release stage was skipped."
         value: ${{ jobs.release.outputs.version }}
       image:
-        description: 'Fully qualified Docker image reference (when the docker stage ran).'
+        description: "Fully qualified Docker image reference (when the docker stage ran)."
         value: ${{ jobs.release.outputs.image }}
       companion_image:
-        description: 'Fully qualified companion Docker image reference (when the companion docker stage ran).'
+        description: "Fully qualified companion Docker image reference (when the companion docker stage ran)."
         value: ${{ jobs.release.outputs.companion_image }}
       release_url:
-        description: 'GitHub Release HTML URL (when the github-release stage ran).'
+        description: "GitHub Release HTML URL (when the github-release stage ran)."
         value: ${{ jobs.release.outputs.release_url }}
       cloudflare_deployed:
-        description: '`true` when the Cloudflare Pages stage actually pushed a deploy.'
+        description: "`true` when the Cloudflare Pages stage actually pushed a deploy."
         value: ${{ jobs.cloudflare-pages.outputs.deployed }}
       cloudflare_deployment_url:
-        description: 'Primary Cloudflare Pages deployment URL (when the cloudflare-pages stage ran).'
+        description: "Primary Cloudflare Pages deployment URL (when the cloudflare-pages stage ran)."
         value: ${{ jobs.cloudflare-pages.outputs.deployment_url }}
       cloudflare_deployment_id:
-        description: 'Cloudflare Pages deployment ID (when the cloudflare-pages stage ran).'
+        description: "Cloudflare Pages deployment ID (when the cloudflare-pages stage ran)."
         value: ${{ jobs.cloudflare-pages.outputs.deployment_id }}
       cloudflare_environment:
-        description: 'Cloudflare Pages environment (`production` or `preview`) for the deploy.'
+        description: "Cloudflare Pages environment (`production` or `preview`) for the deploy."
         value: ${{ jobs.cloudflare-pages.outputs.environment }}
       cloudflare_purged:
-        description: '`true` when the post-deploy zone cache purge ran successfully.'
+        description: "`true` when the post-deploy zone cache purge ran successfully."
         value: ${{ jobs.cloudflare-pages.outputs.purged }}
       cloudflare_ai_bindings:
-        description: 'JSON array of Workers AI binding names present on the project after the deploy stage (empty `[]` when none requested).'
+        description: "JSON array of Workers AI binding names present on the project after the deploy stage (empty `[]` when none requested)."
         value: ${{ jobs.cloudflare-pages-config.outputs.ai_bindings || jobs.cloudflare-pages.outputs.ai_bindings }}
 
 permissions:
@@ -1287,15 +1290,15 @@ jobs:
       actions: read
     uses: blackoutsecure/bos-automation-hub/.github/workflows/security-scan.yml@dev
     with:
-      fail_on:              ${{ inputs.security_scan_fail_on }}
+      fail_on: ${{ inputs.security_scan_fail_on }}
       enable_kit_composite: ${{ inputs.security_scan_enable_kit_composite }}
-      enable_posture:       ${{ inputs.security_scan_enable_posture }}
-      enable_scanners:      ${{ inputs.security_scan_enable_scanners }}
-      enable_upload:        ${{ inputs.security_scan_enable_upload }}
-      codeql_languages:     ${{ inputs.security_scan_codeql_languages }}
-      codeql_queries:       ${{ inputs.security_scan_codeql_queries }}
-      codeql_runs_on:       ${{ inputs.security_scan_codeql_runs_on }}
-      use_advanced_pat:     ${{ inputs.security_scan_use_advanced_pat }}
+      enable_posture: ${{ inputs.security_scan_enable_posture }}
+      enable_scanners: ${{ inputs.security_scan_enable_scanners }}
+      enable_upload: ${{ inputs.security_scan_enable_upload }}
+      codeql_languages: ${{ inputs.security_scan_codeql_languages }}
+      codeql_queries: ${{ inputs.security_scan_codeql_queries }}
+      codeql_runs_on: ${{ inputs.security_scan_codeql_runs_on }}
+      use_advanced_pat: ${{ inputs.security_scan_use_advanced_pat }}
     secrets:
       # Optional pass-through. The code-scan reusable only consults this
       # when `use_advanced_pat` is `true`; otherwise the kit composite
@@ -1306,6 +1309,7 @@ jobs:
       # `uses:` block, which is what makes `secrets.scanning_pat`
       # resolvable here.
       SCANNING_PAT: ${{ secrets.SCANNING_PAT }}
+      GATEWALL_APP_PRIVATE_KEY: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
 
   # ---------------------------------------------------------------------------
   # Stage 1 — detect upstream change (commits tracking file on the default branch).
@@ -1350,25 +1354,26 @@ jobs:
         || inputs.version_url  != ''
       }}
     permissions:
-      contents: write   # commit the tracking file
-      actions:  write   # nested `monitor-upstream-release.yml` declares this for
-                        # `gh workflow run`; GitHub validates the permission at
-                        # workflow-call time even when `target_workflows: ''`
-                        # means it is never actually invoked at runtime.
+      contents: write # commit the tracking file
+      actions:
+        write # nested `monitor-upstream-release.yml` declares this for
+        # `gh workflow run`; GitHub validates the permission at
+        # workflow-call time even when `target_workflows: ''`
+        # means it is never actually invoked at runtime.
     uses: blackoutsecure/bos-automation-hub/.github/workflows/monitor-upstream-release.yml@main
     with:
-      upstream_repo:     ${{ inputs.upstream_repo }}
-      track_file:        ${{ inputs.track_file }}
-      target_workflows:  ''
-      force_dispatch:    ${{ inputs.force_run && 'true' || 'false' }}
-      source:            ${{ inputs.source }}
-      upstream_branch:   ${{ inputs.upstream_branch }}
+      upstream_repo: ${{ inputs.upstream_repo }}
+      track_file: ${{ inputs.track_file }}
+      target_workflows: ""
+      force_dispatch: ${{ inputs.force_run && 'true' || 'false' }}
+      source: ${{ inputs.source }}
+      upstream_branch: ${{ inputs.upstream_branch }}
       version_file_path: ${{ inputs.version_file_path }}
-      image_ref:         ${{ inputs.image_ref }}
-      package_name:      ${{ inputs.package_name }}
-      version_url:       ${{ inputs.version_url }}
-      version_regex:     ${{ inputs.version_regex }}
-      tag_pattern:       ${{ inputs.tag_pattern }}
+      image_ref: ${{ inputs.image_ref }}
+      package_name: ${{ inputs.package_name }}
+      version_url: ${{ inputs.version_url }}
+      version_regex: ${{ inputs.version_regex }}
+      tag_pattern: ${{ inputs.tag_pattern }}
     secrets:
       # Forward upstream auth so callers tracking a private upstream repo
       # can supply a PAT with `contents: read` on it. Unset = fall back to
@@ -1418,61 +1423,64 @@ jobs:
         || needs.security_scan.result == 'skipped'
       )
     permissions:
-      contents:        write   # balena sync_balena_yml + GitHub Release publish
-      pull-requests:   write   # nested docker-build-push declares this for Docker
-                               # Scout PR-annotation paths; statically validated
-                               # at workflow-call time regardless of runtime path.
-      security-events: write   # nested docker-build-push declares this for SARIF
-                               # upload to the GHAS code-scanning dashboard.
-      models:          read    # cascades to `release.yml` -> `github-release.yml`
-                               # `publish` job for the AI changelog step.
-                               # Validated at workflow-load time regardless of
-                               # whether the caller enables AI changelog.
+      contents: write # balena sync_balena_yml + GitHub Release publish
+      pull-requests:
+        write # nested docker-build-push declares this for Docker
+        # Scout PR-annotation paths; statically validated
+        # at workflow-call time regardless of runtime path.
+      security-events:
+        write # nested docker-build-push declares this for SARIF
+        # upload to the GHAS code-scanning dashboard.
+      models:
+        read # cascades to `release.yml` -> `github-release.yml`
+        # `publish` job for the AI changelog step.
+        # Validated at workflow-load time regardless of
+        # whether the caller enables AI changelog.
     uses: blackoutsecure/bos-automation-hub/.github/workflows/release.yml@main
     with:
-      tag_name:                        v${{ needs.monitor.outputs.upstream_version }}
-      docker:                          ${{ inputs.docker }}
-      companion_docker:                ${{ inputs.companion_docker }}
-      balena:                          ${{ inputs.balena }}
-      github_release:                  ${{ inputs.github_release }}
-      image_name:                      ${{ inputs.image_name }}
-      companion_image_name:            ${{ inputs.companion_image_name }}
-      companion_build_target:          ${{ inputs.companion_build_target }}
-      dockerhub_namespace:             ${{ inputs.dockerhub_namespace }}
+      tag_name: v${{ needs.monitor.outputs.upstream_version }}
+      docker: ${{ inputs.docker }}
+      companion_docker: ${{ inputs.companion_docker }}
+      balena: ${{ inputs.balena }}
+      github_release: ${{ inputs.github_release }}
+      image_name: ${{ inputs.image_name }}
+      companion_image_name: ${{ inputs.companion_image_name }}
+      companion_build_target: ${{ inputs.companion_build_target }}
+      dockerhub_namespace: ${{ inputs.dockerhub_namespace }}
       # Smart defaults so thin callers don't have to wire these every time.
       # Override by passing the matching input on the caller side.
-      docker_extra_tags:               ${{ inputs.docker_extra_tags        || format('sha-{0}', github.sha) }}
-      docker_short_description:        ${{ inputs.docker_short_description || github.event.repository.description }}
-      docker_latest:                   ${{ inputs.docker_latest }}
-      docker_multi_arch:               ${{ inputs.docker_multi_arch }}
-      docker_update_description:       ${{ inputs.docker_update_description }}
-      docker_force:                    ${{ inputs.docker_force }}
+      docker_extra_tags: ${{ inputs.docker_extra_tags        || format('sha-{0}', github.sha) }}
+      docker_short_description: ${{ inputs.docker_short_description || github.event.repository.description }}
+      docker_latest: ${{ inputs.docker_latest }}
+      docker_multi_arch: ${{ inputs.docker_multi_arch }}
+      docker_update_description: ${{ inputs.docker_update_description }}
+      docker_force: ${{ inputs.docker_force }}
       companion_docker_short_description: ${{ inputs.companion_docker_short_description }}
-      docker_enable_scout:             ${{ inputs.docker_enable_scout }}
-      docker_scout_command:            ${{ inputs.docker_scout_command }}
-      docker_scout_severities:         ${{ inputs.docker_scout_severities }}
-      docker_scout_only_fixed:         ${{ inputs.docker_scout_only_fixed }}
-      docker_scout_ignore_base:        ${{ inputs.docker_scout_ignore_base }}
-      docker_scout_organization:       ${{ inputs.docker_scout_organization }}
+      docker_enable_scout: ${{ inputs.docker_enable_scout }}
+      docker_scout_command: ${{ inputs.docker_scout_command }}
+      docker_scout_severities: ${{ inputs.docker_scout_severities }}
+      docker_scout_only_fixed: ${{ inputs.docker_scout_only_fixed }}
+      docker_scout_ignore_base: ${{ inputs.docker_scout_ignore_base }}
+      docker_scout_organization: ${{ inputs.docker_scout_organization }}
       docker_scout_record_environment: ${{ inputs.docker_scout_record_environment }}
-      docker_scout_sarif_upload:       ${{ inputs.docker_scout_sarif_upload }}
-      docker_scout_exit_code:          ${{ inputs.docker_scout_exit_code }}
-      docker_scout_enable_repo:        ${{ inputs.docker_scout_enable_repo }}
+      docker_scout_sarif_upload: ${{ inputs.docker_scout_sarif_upload }}
+      docker_scout_exit_code: ${{ inputs.docker_scout_exit_code }}
+      docker_scout_enable_repo: ${{ inputs.docker_scout_enable_repo }}
       # `block_name` defaults to `image_name` when empty \u2014 the overwhelming
       # majority of consumer repos publish a Docker image and a Balena block
       # under the same slug. Override only when they intentionally diverge.
-      block_name:                      ${{ inputs.block_name || inputs.image_name }}
-      balena_namespace:                ${{ inputs.balena_namespace }}
-      balena_sync_yml:                 ${{ inputs.balena_sync_yml }}
-      balena_draft:                    ${{ inputs.balena_draft }}
-      balena_force:                    ${{ inputs.balena_force }}
-      balena_generate_yml:             ${{ inputs.balena_generate_yml }}
-      balena_type:                     ${{ inputs.balena_type }}
-      balena_repository_url:           ${{ inputs.balena_repository_url }}
+      block_name: ${{ inputs.block_name || inputs.image_name }}
+      balena_namespace: ${{ inputs.balena_namespace }}
+      balena_sync_yml: ${{ inputs.balena_sync_yml }}
+      balena_draft: ${{ inputs.balena_draft }}
+      balena_force: ${{ inputs.balena_force }}
+      balena_generate_yml: ${{ inputs.balena_generate_yml }}
+      balena_type: ${{ inputs.balena_type }}
+      balena_repository_url: ${{ inputs.balena_repository_url }}
       # Default to `<default-branch>/logo.png` in the caller repo so blocks
       # render with a logo out of the box. Override to pin a different path.
-      balena_logo_url:                 ${{ inputs.balena_logo_url || format('https://raw.githubusercontent.com/{0}/{1}/logo.png', github.repository, github.event.repository.default_branch) }}
-      balena_default_device_type:      ${{ inputs.balena_default_device_type }}
+      balena_logo_url: ${{ inputs.balena_logo_url || format('https://raw.githubusercontent.com/{0}/{1}/logo.png', github.repository, github.event.repository.default_branch) }}
+      balena_default_device_type: ${{ inputs.balena_default_device_type }}
       # `|-` strips the trailing newline that a plain `|` block would add at
       # each forwarding hop, so multi-line caller values stay byte-stable.
       balena_description: |-
@@ -1481,20 +1489,20 @@ jobs:
         ${{ inputs.balena_post_provisioning }}
       balena_supported_device_types: |-
         ${{ inputs.balena_supported_device_types }}
-      release_template_path:           ${{ inputs.release_template_path }}
+      release_template_path: ${{ inputs.release_template_path }}
       release_extra_context: |
         UPSTREAM_REPO=${{ inputs.upstream_repo }}
         UPSTREAM_TAG=${{ needs.monitor.outputs.upstream_tag }}
         UPSTREAM_COMMIT=${{ needs.monitor.outputs.upstream_commit }}
         ${{ inputs.release_extra_context }}
-      generate_release_notes:          ${{ inputs.generate_release_notes }}
-      release_files:                   ${{ inputs.release_files }}
-      release_draft:                   ${{ inputs.release_draft }}
-      platforms:                       ${{ inputs.platforms }}
+      generate_release_notes: ${{ inputs.generate_release_notes }}
+      release_files: ${{ inputs.release_files }}
+      release_draft: ${{ inputs.release_draft }}
+      platforms: ${{ inputs.platforms }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
-      BALENA_API_TOKEN:   ${{ secrets.BALENA_API_TOKEN }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      BALENA_API_TOKEN: ${{ secrets.BALENA_API_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # Stage 3 — Cloudflare Pages deploy (static-site path).
@@ -1530,12 +1538,12 @@ jobs:
       contents: read
     uses: blackoutsecure/bos-automation-hub/.github/workflows/deploy-cloudflare-pages.yml@dev
     with:
-      cloudflare_project_name:    ${{ inputs.cloudflare_project_name }}
-      deployment_environment:     ${{ inputs.cloudflare_deployment_environment }}
-      site_url:                   ${{ inputs.cloudflare_site_url }}
-      public_dir:                 ${{ inputs.cloudflare_public_dir }}
-      deploy_dir:                 ${{ inputs.cloudflare_deploy_dir }}
-      clean_deploy_dir:           ${{ inputs.cloudflare_clean_deploy_dir }}
+      cloudflare_project_name: ${{ inputs.cloudflare_project_name }}
+      deployment_environment: ${{ inputs.cloudflare_deployment_environment }}
+      site_url: ${{ inputs.cloudflare_site_url }}
+      public_dir: ${{ inputs.cloudflare_public_dir }}
+      deploy_dir: ${{ inputs.cloudflare_deploy_dir }}
+      clean_deploy_dir: ${{ inputs.cloudflare_clean_deploy_dir }}
       # `|-` strips the trailing newline that a plain `|` block would add at
       # each forwarding hop, so multi-line caller values (one path per line)
       # stay byte-stable across the launchpad → deploy-cloudflare-pages hop.
@@ -1543,45 +1551,45 @@ jobs:
         ${{ inputs.cloudflare_copy_files }}
       copy_dirs: |-
         ${{ inputs.cloudflare_copy_dirs }}
-      prebuild_command:           ${{ inputs.cloudflare_prebuild_command }}
-      working_directory:          ${{ inputs.cloudflare_working_directory }}
-      branch:                     ${{ inputs.cloudflare_branch }}
-      commit_message:             ${{ inputs.cloudflare_commit_message }}
-      wrangler_version:           ${{ inputs.cloudflare_wrangler_version }}
-      extra_wrangler_args:        ${{ inputs.cloudflare_extra_wrangler_args }}
-      ai_bindings:                ${{ inputs.cloudflare_ai_bindings }}
-      deploy_artifact_name:       ${{ inputs.cloudflare_deploy_artifact_name }}
-      deploy:                     ${{ inputs.cloudflare_deploy }}
-      runs_on:                    ${{ inputs.cloudflare_runs_on }}
-      checkout_fetch_depth:       ${{ inputs.cloudflare_checkout_fetch_depth }}
-      purge_cache:                ${{ inputs.cloudflare_purge_cache }}
-      generate_sitemap:           ${{ inputs.cloudflare_generate_sitemap }}
-      generate_robots:            ${{ inputs.cloudflare_generate_robots }}
-      generate_security_txt:      ${{ inputs.cloudflare_generate_security_txt }}
-      generate_humans_txt:        ${{ inputs.cloudflare_generate_humans_txt }}
-      security_contact:           ${{ inputs.cloudflare_security_contact }}
-      generator_audit:            ${{ inputs.cloudflare_generator_audit }}
-      generator_audit_fail_on:    ${{ inputs.cloudflare_generator_audit_fail_on }}
+      prebuild_command: ${{ inputs.cloudflare_prebuild_command }}
+      working_directory: ${{ inputs.cloudflare_working_directory }}
+      branch: ${{ inputs.cloudflare_branch }}
+      commit_message: ${{ inputs.cloudflare_commit_message }}
+      wrangler_version: ${{ inputs.cloudflare_wrangler_version }}
+      extra_wrangler_args: ${{ inputs.cloudflare_extra_wrangler_args }}
+      ai_bindings: ${{ inputs.cloudflare_ai_bindings }}
+      deploy_artifact_name: ${{ inputs.cloudflare_deploy_artifact_name }}
+      deploy: ${{ inputs.cloudflare_deploy }}
+      runs_on: ${{ inputs.cloudflare_runs_on }}
+      checkout_fetch_depth: ${{ inputs.cloudflare_checkout_fetch_depth }}
+      purge_cache: ${{ inputs.cloudflare_purge_cache }}
+      generate_sitemap: ${{ inputs.cloudflare_generate_sitemap }}
+      generate_robots: ${{ inputs.cloudflare_generate_robots }}
+      generate_security_txt: ${{ inputs.cloudflare_generate_security_txt }}
+      generate_humans_txt: ${{ inputs.cloudflare_generate_humans_txt }}
+      security_contact: ${{ inputs.cloudflare_security_contact }}
+      generator_audit: ${{ inputs.cloudflare_generator_audit }}
+      generator_audit_fail_on: ${{ inputs.cloudflare_generator_audit_fail_on }}
       generator_audit_artifact_name: ${{ inputs.cloudflare_generator_audit_artifact_name }}
-      generate_manifest:          ${{ inputs.cloudflare_generate_manifest }}
-      manifest_name:              ${{ inputs.cloudflare_manifest_name }}
-      manifest_short_name:        ${{ inputs.cloudflare_manifest_short_name }}
-      manifest_description:       ${{ inputs.cloudflare_manifest_description }}
-      manifest_orientation:       ${{ inputs.cloudflare_manifest_orientation }}
-      manifest_theme_color:       ${{ inputs.cloudflare_manifest_theme_color }}
-      manifest_background_color:  ${{ inputs.cloudflare_manifest_background_color }}
-      manifest_lang:              ${{ inputs.cloudflare_manifest_lang }}
-      manifest_dir:               ${{ inputs.cloudflare_manifest_dir }}
-      manifest_categories:        ${{ inputs.cloudflare_manifest_categories }}
-      manifest_icons_dir:         ${{ inputs.cloudflare_manifest_icons_dir }}
-      generate_redirects:         ${{ inputs.cloudflare_generate_redirects }}
+      generate_manifest: ${{ inputs.cloudflare_generate_manifest }}
+      manifest_name: ${{ inputs.cloudflare_manifest_name }}
+      manifest_short_name: ${{ inputs.cloudflare_manifest_short_name }}
+      manifest_description: ${{ inputs.cloudflare_manifest_description }}
+      manifest_orientation: ${{ inputs.cloudflare_manifest_orientation }}
+      manifest_theme_color: ${{ inputs.cloudflare_manifest_theme_color }}
+      manifest_background_color: ${{ inputs.cloudflare_manifest_background_color }}
+      manifest_lang: ${{ inputs.cloudflare_manifest_lang }}
+      manifest_dir: ${{ inputs.cloudflare_manifest_dir }}
+      manifest_categories: ${{ inputs.cloudflare_manifest_categories }}
+      manifest_icons_dir: ${{ inputs.cloudflare_manifest_icons_dir }}
+      generate_redirects: ${{ inputs.cloudflare_generate_redirects }}
       redirects_custom_rules: |-
         ${{ inputs.cloudflare_redirects_custom_rules }}
       redirects_replace_existing: ${{ inputs.cloudflare_redirects_replace_existing }}
-      generate_headers:           ${{ inputs.cloudflare_generate_headers }}
-      headers_presets:            ${{ inputs.cloudflare_headers_presets }}
-      headers_csp:                ${{ inputs.cloudflare_headers_csp }}
-      headers_hsts_max_age:       ${{ inputs.cloudflare_headers_hsts_max_age }}
+      generate_headers: ${{ inputs.cloudflare_generate_headers }}
+      headers_presets: ${{ inputs.cloudflare_headers_presets }}
+      headers_csp: ${{ inputs.cloudflare_headers_csp }}
+      headers_hsts_max_age: ${{ inputs.cloudflare_headers_hsts_max_age }}
       headers_permissions_policy: ${{ inputs.cloudflare_headers_permissions_policy }}
       headers_cache_html_control: ${{ inputs.cloudflare_headers_cache_html_control }}
       headers_cache_assets_pattern: ${{ inputs.cloudflare_headers_cache_assets_pattern }}
@@ -1591,13 +1599,13 @@ jobs:
       common_robots_txt_cache_control: ${{ inputs.cloudflare_common_robots_txt_cache_control }}
       common_sitemap_xml_cache_control: ${{ inputs.cloudflare_common_sitemap_xml_cache_control }}
       common_humans_txt_cache_control: ${{ inputs.cloudflare_common_humans_txt_cache_control }}
-      headers_custom_rules:       ${{ inputs.cloudflare_headers_custom_rules }}
-      headers_replace_existing:   ${{ inputs.cloudflare_headers_replace_existing }}
+      headers_custom_rules: ${{ inputs.cloudflare_headers_custom_rules }}
+      headers_replace_existing: ${{ inputs.cloudflare_headers_replace_existing }}
     secrets:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_PAGES_ADMIN_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_ADMIN_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_ZONE_ID:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
 
   cloudflare-pages-config:
     name: Cloudflare Pages deploy (config-driven)
@@ -1617,55 +1625,55 @@ jobs:
       contents: read
     uses: blackoutsecure/bos-automation-hub/.github/workflows/deploy-cloudflare-pages.yml@dev
     with:
-      cloudflare_project_name:    ${{ fromJson(needs.parse-config.outputs.cloudflare).project_name }}
-      deployment_environment:     ${{ fromJson(needs.parse-config.outputs.cloudflare).deployment_environment }}
-      site_url:                   ${{ fromJson(needs.parse-config.outputs.cloudflare).site_url }}
-      public_dir:                 ${{ fromJson(needs.parse-config.outputs.cloudflare).public_dir }}
-      deploy_dir:                 ${{ fromJson(needs.parse-config.outputs.cloudflare).deploy_dir }}
-      clean_deploy_dir:           ${{ fromJson(needs.parse-config.outputs.cloudflare).clean_deploy_dir }}
+      cloudflare_project_name: ${{ fromJson(needs.parse-config.outputs.cloudflare).project_name }}
+      deployment_environment: ${{ fromJson(needs.parse-config.outputs.cloudflare).deployment_environment }}
+      site_url: ${{ fromJson(needs.parse-config.outputs.cloudflare).site_url }}
+      public_dir: ${{ fromJson(needs.parse-config.outputs.cloudflare).public_dir }}
+      deploy_dir: ${{ fromJson(needs.parse-config.outputs.cloudflare).deploy_dir }}
+      clean_deploy_dir: ${{ fromJson(needs.parse-config.outputs.cloudflare).clean_deploy_dir }}
       copy_files: |-
         ${{ fromJson(needs.parse-config.outputs.cloudflare).copy_files }}
       copy_dirs: |-
         ${{ fromJson(needs.parse-config.outputs.cloudflare).copy_dirs }}
-      prebuild_command:           ${{ fromJson(needs.parse-config.outputs.cloudflare).prebuild_command }}
-      working_directory:          ${{ fromJson(needs.parse-config.outputs.cloudflare).working_directory }}
-      branch:                     ${{ fromJson(needs.parse-config.outputs.cloudflare).branch }}
-      commit_message:             ${{ fromJson(needs.parse-config.outputs.cloudflare).commit_message }}
-      wrangler_version:           ${{ fromJson(needs.parse-config.outputs.cloudflare).wrangler_version }}
-      extra_wrangler_args:        ${{ fromJson(needs.parse-config.outputs.cloudflare).extra_wrangler_args }}
-      ai_bindings:                ${{ toJson(fromJson(needs.parse-config.outputs.cloudflare).ai_bindings) }}
-      deploy_artifact_name:       ${{ fromJson(needs.parse-config.outputs.cloudflare).deploy_artifact_name }}
-      deploy:                     ${{ inputs.force_run && 'true' || fromJson(needs.parse-config.outputs.cloudflare).deploy }}
-      runs_on:                    ${{ fromJson(needs.parse-config.outputs.cloudflare).runs_on }}
-      checkout_fetch_depth:       ${{ fromJson(needs.parse-config.outputs.cloudflare).checkout_fetch_depth }}
-      purge_cache:                ${{ fromJson(needs.parse-config.outputs.cloudflare).purge_cache }}
-      generate_sitemap:           ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_sitemap }}
-      generate_robots:            ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_robots }}
-      generate_security_txt:      ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_security_txt }}
-      generate_humans_txt:        ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_humans_txt }}
-      security_contact:           ${{ fromJson(needs.parse-config.outputs.cloudflare).security_contact }}
-      generator_audit:            ${{ fromJson(needs.parse-config.outputs.cloudflare).generator_audit }}
-      generator_audit_fail_on:    ${{ fromJson(needs.parse-config.outputs.cloudflare).generator_audit_fail_on }}
+      prebuild_command: ${{ fromJson(needs.parse-config.outputs.cloudflare).prebuild_command }}
+      working_directory: ${{ fromJson(needs.parse-config.outputs.cloudflare).working_directory }}
+      branch: ${{ fromJson(needs.parse-config.outputs.cloudflare).branch }}
+      commit_message: ${{ fromJson(needs.parse-config.outputs.cloudflare).commit_message }}
+      wrangler_version: ${{ fromJson(needs.parse-config.outputs.cloudflare).wrangler_version }}
+      extra_wrangler_args: ${{ fromJson(needs.parse-config.outputs.cloudflare).extra_wrangler_args }}
+      ai_bindings: ${{ toJson(fromJson(needs.parse-config.outputs.cloudflare).ai_bindings) }}
+      deploy_artifact_name: ${{ fromJson(needs.parse-config.outputs.cloudflare).deploy_artifact_name }}
+      deploy: ${{ inputs.force_run && 'true' || fromJson(needs.parse-config.outputs.cloudflare).deploy }}
+      runs_on: ${{ fromJson(needs.parse-config.outputs.cloudflare).runs_on }}
+      checkout_fetch_depth: ${{ fromJson(needs.parse-config.outputs.cloudflare).checkout_fetch_depth }}
+      purge_cache: ${{ fromJson(needs.parse-config.outputs.cloudflare).purge_cache }}
+      generate_sitemap: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_sitemap }}
+      generate_robots: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_robots }}
+      generate_security_txt: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_security_txt }}
+      generate_humans_txt: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_humans_txt }}
+      security_contact: ${{ fromJson(needs.parse-config.outputs.cloudflare).security_contact }}
+      generator_audit: ${{ fromJson(needs.parse-config.outputs.cloudflare).generator_audit }}
+      generator_audit_fail_on: ${{ fromJson(needs.parse-config.outputs.cloudflare).generator_audit_fail_on }}
       generator_audit_artifact_name: ${{ fromJson(needs.parse-config.outputs.cloudflare).generator_audit_artifact_name }}
-      generate_manifest:          ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_manifest }}
-      manifest_name:              ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_name }}
-      manifest_short_name:        ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_short_name }}
-      manifest_description:       ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_description }}
-      manifest_orientation:       ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_orientation }}
-      manifest_theme_color:       ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_theme_color }}
-      manifest_background_color:  ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_background_color }}
-      manifest_lang:              ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_lang }}
-      manifest_dir:               ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_dir }}
-      manifest_categories:        ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_categories }}
-      manifest_icons_dir:         ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_icons_dir }}
-      generate_redirects:         ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_redirects }}
+      generate_manifest: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_manifest }}
+      manifest_name: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_name }}
+      manifest_short_name: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_short_name }}
+      manifest_description: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_description }}
+      manifest_orientation: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_orientation }}
+      manifest_theme_color: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_theme_color }}
+      manifest_background_color: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_background_color }}
+      manifest_lang: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_lang }}
+      manifest_dir: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_dir }}
+      manifest_categories: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_categories }}
+      manifest_icons_dir: ${{ fromJson(needs.parse-config.outputs.cloudflare).manifest_icons_dir }}
+      generate_redirects: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_redirects }}
       redirects_custom_rules: |-
         ${{ fromJson(needs.parse-config.outputs.cloudflare).redirects_custom_rules }}
       redirects_replace_existing: ${{ fromJson(needs.parse-config.outputs.cloudflare).redirects_replace_existing }}
-      generate_headers:           ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_headers }}
-      headers_presets:            ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_presets }}
-      headers_csp:                ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_csp }}
-      headers_hsts_max_age:       ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_hsts_max_age }}
+      generate_headers: ${{ fromJson(needs.parse-config.outputs.cloudflare).generate_headers }}
+      headers_presets: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_presets }}
+      headers_csp: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_csp }}
+      headers_hsts_max_age: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_hsts_max_age }}
       headers_permissions_policy: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_permissions_policy }}
       headers_cache_html_control: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_cache_html_control }}
       headers_cache_assets_pattern: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_cache_assets_pattern }}
@@ -1675,13 +1683,13 @@ jobs:
       common_robots_txt_cache_control: ${{ fromJson(needs.parse-config.outputs.cloudflare).common_robots_txt_cache_control }}
       common_sitemap_xml_cache_control: ${{ fromJson(needs.parse-config.outputs.cloudflare).common_sitemap_xml_cache_control }}
       common_humans_txt_cache_control: ${{ fromJson(needs.parse-config.outputs.cloudflare).common_humans_txt_cache_control }}
-      headers_custom_rules:       ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_custom_rules }}
-      headers_replace_existing:   ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_replace_existing }}
+      headers_custom_rules: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_custom_rules }}
+      headers_replace_existing: ${{ fromJson(needs.parse-config.outputs.cloudflare).headers_replace_existing }}
     secrets:
-      CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_PAGES_ADMIN_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_ADMIN_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_ZONE_ID:    ${{ secrets.CLOUDFLARE_ZONE_ID }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
 
   # ---------------------------------------------------------------------------
   # Stage 4 — Repo About-box sync (opt-in, independent of the deploy path).
@@ -1713,3 +1721,4 @@ jobs:
       dry_run: ${{ inputs.repo_metadata_dry_run }}
     secrets:
       REPO_ADMIN_PAT: ${{ secrets.REPO_ADMIN_PAT || secrets.RELEASE_PAT }}
+      GATEWALL_APP_PRIVATE_KEY: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}

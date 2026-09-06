@@ -9,24 +9,60 @@ inputs:
   allow_missing:
     description: Emit {} when config file is missing instead of failing.
     required: false
-    default: 'false'
+    default: "false"
   require_marketplace_enabled:
     description: Fail unless `marketplace.enabled` is `true` in the parsed config.
     required: false
-    default: 'false'
+    default: "false"
   global_config_path:
     description: >-
       Path to an optional org-wide global config JSON file (e.g. checked
-      out from bos-automation-hub's sync-files/config/). Currently only
-      merges the `action_test` section; repo config always wins over it.
+      out from bos-automation-hub's sync-files/config/). Supported policy
+      sections are merged with repository config taking precedence.
     required: false
-    default: ''
+    default: ""
   use_global_config:
     description: "'auto' loads global_config_path when the file exists, 'true' requires it, 'false' ignores it."
     required: false
-    default: 'auto'
+    default: "auto"
+    summary_context:
+      description: Optional service or workflow label included in the configuration summary.
+      required: false
+      default: ""
 
-outputs: {cfg: {description: 'Compact JSON object for downstream fromJson usage.', value: '${{ steps.config.outputs.cfg }}'}, cloudflare: {description: 'Normalized Cloudflare block derived from the config.', value: '${{ steps.config.outputs.cloudflare }}'}, action_test: {description: 'Normalized action_test block derived from the config.', value: '${{ steps.config.outputs.action_test }}'}, organization: {description: 'Normalized organization block (runners, reporting, per-workflow overrides).', value: '${{ steps.config.outputs.organization }}'}, sync: {description: 'Normalized managed_file_sync block.', value: '${{ steps.config.outputs.sync }}'}}
+outputs:
+  {
+    cfg:
+      {
+        description: "Compact JSON object for downstream fromJson usage.",
+        value: "${{ steps.config.outputs.cfg }}",
+      },
+    cloudflare:
+      {
+        description: "Normalized Cloudflare block derived from the config.",
+        value: "${{ steps.config.outputs.cloudflare }}",
+      },
+    action_test:
+      {
+        description: "Normalized action_test block derived from the config.",
+        value: "${{ steps.config.outputs.action_test }}",
+      },
+    release_validation:
+      {
+        description: "Normalized release_validation policy.",
+        value: "${{ steps.config.outputs.release_validation }}",
+      },
+    organization:
+      {
+        description: "Normalized organization block (runners, reporting, per-workflow overrides).",
+        value: "${{ steps.config.outputs.organization }}",
+      },
+    sync:
+      {
+        description: "Normalized managed_file_sync block.",
+        value: "${{ steps.config.outputs.sync }}",
+      },
+  }
 
 runs:
   using: composite
@@ -40,6 +76,7 @@ runs:
         REQUIRE_MARKETPLACE_ENABLED: ${{ inputs.require_marketplace_enabled }}
         GLOBAL_CONFIG_PATH: ${{ inputs.global_config_path }}
         USE_GLOBAL_CONFIG: ${{ inputs.use_global_config }}
+        SUMMARY_CONTEXT: ${{ inputs.summary_context || github.workflow }}
       run: |
         set -euo pipefail
         python3 - <<'PY'
@@ -52,6 +89,7 @@ runs:
         require_marketplace_enabled = (os.environ.get("REQUIRE_MARKETPLACE_ENABLED") or "false").lower() == "true"
         global_config_path = (os.environ.get("GLOBAL_CONFIG_PATH") or "").strip()
         use_global_config = (os.environ.get("USE_GLOBAL_CONFIG") or "auto").strip().lower()
+        summary_context = (os.environ.get("SUMMARY_CONTEXT") or "").strip()
         output_path = os.environ["GITHUB_OUTPUT"]
         summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
 
@@ -186,6 +224,7 @@ runs:
         stages = as_dict(cfg.get("stages"))
         upstream = as_dict(cfg.get("upstream"))
         release = as_dict(cfg.get("release"))
+        security_scan_raw = as_dict(cfg.get("security_scan"))
         cloudflare_raw = as_dict(cfg.get("cloudflare"))
         redirects = as_dict(cloudflare_raw.get("redirects"))
         headers = as_dict(cloudflare_raw.get("headers"))
@@ -230,6 +269,20 @@ runs:
             marketplace["source_branch"] = str(global_marketplace_raw["source_branch"])
 
         cfg["marketplace"] = marketplace
+
+        cfg["security_scan"] = {
+            "enable": security_scan_raw.get("enable") is not False,
+            "fail_on": str(security_scan_raw.get("fail_on") or "fail"),
+            "blocks_release": security_scan_raw.get("blocks_release") is not False,
+            "enable_kit_composite": security_scan_raw.get("enable_kit_composite") is not False,
+            "enable_posture": security_scan_raw.get("enable_posture") is not False,
+            "enable_scanners": security_scan_raw.get("enable_scanners") is not False,
+            "enable_upload": security_scan_raw.get("enable_upload") is not False,
+            "codeql_languages": str(security_scan_raw.get("codeql_languages") or ""),
+            "codeql_queries": str(security_scan_raw.get("codeql_queries") or "security-and-quality"),
+            "codeql_runs_on": str(security_scan_raw.get("codeql_runs_on") or ""),
+            "use_advanced_pat": security_scan_raw.get("use_advanced_pat") is not False,
+        }
 
         if require_marketplace_enabled and marketplace.get("enabled") is not True:
             error(f"::error file={config_path}::marketplace.enabled must be true")
@@ -441,6 +494,67 @@ runs:
             "ai_model": str(merged_scalar("ai_model") or "auto"),
         }
 
+        # Release validation is centrally defaulted and repository-extensible.
+        global_release_validation = as_dict(global_cfg.get("release_validation"))
+        repo_release_validation = as_dict(cfg.get("release_validation"))
+        merged_release_validation = dict(global_release_validation)
+        merged_release_validation.update(repo_release_validation)
+
+        def release_string_list(value, field):
+            if value is None:
+                return []
+            if not isinstance(value, list):
+                error(f"::error file={config_path}::release_validation.{field} must be an array of strings.")
+                sys.exit(1)
+            normalized = []
+            for index, item in enumerate(value):
+                if not isinstance(item, str) or not item.strip():
+                    error(
+                        f"::error file={config_path}::release_validation.{field}[{index}] "
+                        "must be a non-empty string."
+                    )
+                    sys.exit(1)
+                normalized.append(item.strip())
+            return normalized
+
+        validation_enforce = str(merged_release_validation.get("enforce") or "fail").lower()
+        if validation_enforce not in {"fail", "warn", "never"}:
+            error(
+                f"::error file={config_path}::release_validation.enforce must be "
+                "`fail`, `warn`, or `never`."
+            )
+            sys.exit(1)
+        version_match = str(merged_release_validation.get("version_match") or "warn").lower()
+        if version_match not in {"fail", "warn", "skip"}:
+            error(
+                f"::error file={config_path}::release_validation.version_match must be "
+                "`fail`, `warn`, or `skip`."
+            )
+            sys.exit(1)
+
+        release_validation = {
+            "enabled": merged_release_validation.get("enabled") is not False,
+            "enforce": validation_enforce,
+            "run_node": merged_release_validation.get("run_node") is not False,
+            "run_python": merged_release_validation.get("run_python") is not False,
+            "run_custom": merged_release_validation.get("run_custom") is not False,
+            "verify_clean_tree": merged_release_validation.get("verify_clean_tree") is not False,
+            "require_lockfile": merged_release_validation.get("require_lockfile") is not False,
+            "version_match": version_match,
+            "required_paths": release_string_list(
+                merged_release_validation.get("required_paths", ["README.md", "LICENSE"]),
+                "required_paths",
+            ),
+            "custom_hook": str(
+                merged_release_validation.get("custom_hook")
+                or ".github/scripts/release-validation.sh"
+            ),
+            "custom_commands": release_string_list(
+                merged_release_validation.get("custom_commands", []),
+                "custom_commands",
+            ),
+        }
+
         # ── organization section ──────────────────────────────────
         # Org-wide runner labels, report policy, and per-workflow
         # overrides. Every hub workflow reads its `runs_on` /
@@ -525,6 +639,7 @@ runs:
         compact_cloudflare = json.dumps(cloudflare, separators=(",", ":"))
         compact_sync = json.dumps(sync, separators=(",", ":"))
         compact_action_test = json.dumps(action_test, separators=(",", ":"))
+        compact_release_validation = json.dumps(release_validation, separators=(",", ":"))
         compact_organization = json.dumps(organization, separators=(",", ":"))
 
         cloudflare_enabled = stages.get("cloudflare_pages") is True or bool(cloudflare_raw.get("project_name"))
@@ -536,50 +651,83 @@ runs:
             "managed_files_sync": bool(sync_services),
         }
         enabled_stages = ", ".join([key for key, value in stage_flags.items() if value]) or "(none)"
-        cf_site = (cloudflare_raw.get("site_url") or "").strip() or "(unset)"
-        cf_project = (cloudflare_raw.get("project_name") or "").strip() or "(unset)"
-        cf_env = (cloudflare_raw.get("deployment_environment") or "").strip() or "(unset)"
+        cf_site = (cloudflare_raw.get("site_url") or "").strip()
+        cf_project = (cloudflare_raw.get("project_name") or "").strip()
+        cf_env = (cloudflare_raw.get("deployment_environment") or "").strip()
         sync_mode = (sync_raw.get("mode") or "commit") if isinstance(sync_raw.get("mode"), str) else "commit"
-        sync_services_text = ", ".join(sync_services) if sync_services else "(none)"
-        upstream_source = (upstream.get("source") or "").strip() or "(unset)"
-        release_template_path = (release.get("template_path") or "").strip() or "(unset)"
+        sync_services_text = ", ".join(sync_services)
+        upstream_source = (upstream.get("source") or "").strip()
+        release_template_path = (release.get("template_path") or "").strip()
 
         def label_text(value):
             return ", ".join(value) if isinstance(value, list) else str(value)
 
+        audit_failures = []
+
+        def summary_value(value, *, required=False, field=""):
+            if value:
+                return f"✅ `{value}`"
+            if required:
+                audit_failures.append(field)
+                return "❌ **unset (required)**"
+            return None
+
+        summary_rows = [
+            ("Enabled stages", f"✅ `{enabled_stages}`"),
+            ("Upstream source", summary_value(
+                upstream_source,
+                required=stage_flags["docker"] or stage_flags["balena"],
+                field="upstream.source",
+            ) if stage_flags["docker"] or stage_flags["balena"] else None),
+            ("Cloudflare project", summary_value(
+                cf_project,
+                required=True,
+                field="cloudflare.project_name",
+            ) if stage_flags["cloudflare_pages"] else None),
+            ("Cloudflare environment", summary_value(cf_env) if stage_flags["cloudflare_pages"] else None),
+            ("Cloudflare site URL", summary_value(cf_site) if stage_flags["cloudflare_pages"] else None),
+            ("Sync mode", f"✅ `{sync_mode}`" if stage_flags["managed_files_sync"] else None),
+            ("Sync services", summary_value(sync_services_text) if stage_flags["managed_files_sync"] else None),
+            ("Release template path", summary_value(release_template_path) if stage_flags["github_release"] else None),
+            ("Default runner", f"✅ `{label_text(runners['default'])}`"),
+            ("Runner (x64 / arm64)", f"✅ `{label_text(runners['x64'])}` / `{label_text(runners['arm64'])}`"),
+            ("Default job timeout", f"✅ `{default_timeout}` min"),
+            ("Report policy", f"✅ `fail_on={reporting['fail_on']}`, "
+             f"summary={str(reporting['enable_job_summary']).lower()}, "
+             f"annotations={str(reporting['enable_annotations']).lower()}"),
+        ]
         summary_lines = [
-            "## Universal config snapshot",
+            "## Universal config snapshot" + (f" - {summary_context}" if summary_context else ""),
             "",
             "| Field | Value |",
             "| --- | --- |",
-            f"| Enabled stages | `{enabled_stages}` |",
-            f"| Upstream source | `{upstream_source}` |",
-            f"| Cloudflare project | `{cf_project}` |",
-            f"| Cloudflare environment | `{cf_env}` |",
-            f"| Cloudflare site URL | `{cf_site}` |",
-            f"| Sync mode | `{sync_mode}` |",
-            f"| Sync services | `{sync_services_text}` |",
-            f"| Release template path | `{release_template_path}` |",
-            f"| Default runner | `{label_text(runners['default'])}` |",
-            f"| Runner (x64 / arm64) | `{label_text(runners['x64'])}` / `{label_text(runners['arm64'])}` |",
-            f"| Default job timeout | `{default_timeout}` min |",
-            f"| Report policy | `fail_on={reporting['fail_on']}`, "
-            f"summary={str(reporting['enable_job_summary']).lower()}, "
-            f"annotations={str(reporting['enable_annotations']).lower()} |",
         ]
+        summary_lines.extend(
+            f"| {field} | {value} |"
+            for field, value in summary_rows
+            if value is not None
+        )
 
         if summary_path:
             with open(summary_path, "a", encoding="utf-8") as handle:
                 handle.write("\n".join(summary_lines) + "\n")
 
-        print("Universal config snapshot:")
+        if audit_failures:
+            for field in audit_failures:
+                error(f"::error file={config_path}::Required applicable configuration is unset: {field}.")
+            sys.exit(1)
+
+        print("Universal config snapshot" + (f" ({summary_context})" if summary_context else "") + ":")
         print(f"  enabled_stages: {enabled_stages}")
-        print(f"  upstream_source: {upstream_source}")
-        print(f"  cloudflare_project: {cf_project}")
-        print(f"  cloudflare_environment: {cf_env}")
-        print(f"  cloudflare_site_url: {cf_site}")
-        print(f"  sync_mode: {sync_mode}")
-        print(f"  sync_services: {sync_services_text}")
+        if stage_flags["docker"] or stage_flags["balena"]:
+            print(f"  upstream_source: {upstream_source or '(unset)'}")
+        if stage_flags["cloudflare_pages"]:
+            print(f"  cloudflare_project: {cf_project or '(unset)'}")
+            print(f"  cloudflare_environment: {cf_env or '(unset)'}")
+            print(f"  cloudflare_site_url: {cf_site or '(unset)'}")
+        if stage_flags["managed_files_sync"]:
+            print(f"  sync_mode: {sync_mode}")
+            print(f"  sync_services: {sync_services_text}")
         print(f"  default_runner: {label_text(runners['default'])}")
         print(f"  default_timeout_minutes: {default_timeout}")
         print(f"  reporting_fail_on: {reporting['fail_on']}")
@@ -591,5 +739,6 @@ runs:
             handle.write(f"cloudflare={compact_cloudflare}\n")
             handle.write(f"sync={compact_sync}\n")
             handle.write(f"action_test={compact_action_test}\n")
+            handle.write(f"release_validation={compact_release_validation}\n")
             handle.write(f"organization={compact_organization}\n")
         PY

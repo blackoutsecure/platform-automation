@@ -6,8 +6,14 @@
     "community_health_source": "inherit",
     "enable_security_scan": true,
     "defer_to_code_scanning_kit": true,
+    "require_sponsorship": "warn",
+    "funding_source": "inherit",
     "enable_ai_findings_summary": false,
     "version": "auto",
-    "license": "auto"
+    "license": "auto",
+    "require_license_audit": "fail",
+    "allowed_licenses": ["Apache-2.0"],
+    "denied_licenses": [],
+    "license_catalogue_max_age_days": 400
   }
 }

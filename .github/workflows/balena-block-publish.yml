@@ -4,20 +4,20 @@ name: Balena Block Publish
   workflow_call:
     inputs:
       block_name:
-        description: 'Balena block slug (without namespace).'
+        description: "Balena block slug (without namespace)."
         required: true
         type: string
       balena_namespace:
-        description: 'Balena namespace (user/org) that owns the block.'
+        description: "Balena namespace (user/org) that owns the block."
         required: true
         type: string
       source:
-        description: 'Path passed as `source` to deploy-to-balena-action.'
+        description: "Path passed as `source` to deploy-to-balena-action."
         required: false
         type: string
         default: .
       balena_yml_path:
-        description: 'Path to balena.yml (used for version sync).'
+        description: "Path to balena.yml (used for version sync)."
         required: false
         type: string
         default: ./balena.yml
@@ -25,34 +25,34 @@ name: Balena Block Publish
         description: "'true'/'false' to force; empty => publish only on push to default branch."
         required: false
         type: string
-        default: ''
+        default: ""
       version:
-        description: 'Explicit version. Overrides auto-resolved when set.'
+        description: "Explicit version. Overrides auto-resolved when set."
         required: false
         type: string
-        default: ''
+        default: ""
       auto_resolve_version:
-        description: 'Run `resolve-docker-image-tags` to derive the version.'
+        description: "Run `resolve-docker-image-tags` to derive the version."
         required: false
         type: boolean
         default: true
       version_source:
-        description: '`auto` | `dockerfile` | `file` | `git_tag` | `sha`.'
+        description: "`auto` | `dockerfile` | `file` | `git_tag` | `sha`."
         required: false
         type: string
         default: auto
       dockerfile:
-        description: 'Path to the Dockerfile (used by version resolver).'
+        description: "Path to the Dockerfile (used by version resolver)."
         required: false
         type: string
         default: ./Dockerfile
       version_build_arg:
-        description: 'Dockerfile ARG name to read the version from.'
+        description: "Dockerfile ARG name to read the version from."
         required: false
         type: string
         default: APP_VERSION
       version_file:
-        description: 'Plain-text version file path (used by `file`/`auto`).'
+        description: "Plain-text version file path (used by `file`/`auto`)."
         required: false
         type: string
         default: VERSION
@@ -91,7 +91,7 @@ name: Balena Block Publish
           `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_post_provisioning:
         description: >-
           Rendered `post-provisioning:` Markdown. Multi-line; pass as a
@@ -99,7 +99,7 @@ name: Balena Block Publish
           only when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_assets_repository_url:
         description: >-
           `assets.repository.data.url` for the rendered manifest. When
@@ -108,7 +108,7 @@ name: Balena Block Publish
           when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_assets_logo_url:
         description: >-
           Optional `assets.logo.data.url` for the rendered manifest.
@@ -116,7 +116,7 @@ name: Balena Block Publish
           only when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_default_device_type:
         description: >-
           `data.defaultDeviceType` slug for the rendered manifest.
@@ -128,7 +128,7 @@ name: Balena Block Publish
           `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_supported_device_types:
         description: >-
           Explicit `data.supportedDeviceTypes` list. Accepts newline-
@@ -140,7 +140,7 @@ name: Balena Block Publish
           four must resolve. Used only when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_architectures:
         description: >-
           Newline- and/or comma-separated balena arch slugs (`aarch64`,
@@ -150,7 +150,7 @@ name: Balena Block Publish
           `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_platforms:
         description: >-
           Comma-separated docker buildx platform list, e.g.
@@ -161,7 +161,7 @@ name: Balena Block Publish
           when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_image_ref:
         description: >-
           Optional fully-qualified docker image reference
@@ -173,9 +173,9 @@ name: Balena Block Publish
           sniff failure. Used only when `generate_balena_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       draft:
-        description: 'Publish as a draft (sets `finalize: false`).'
+        description: "Publish as a draft (sets `finalize: false`)."
         required: false
         type: boolean
         default: false
@@ -191,17 +191,17 @@ name: Balena Block Publish
         type: boolean
         default: false
       cache:
-        description: 'Forwarded to deploy-to-balena-action `cache`.'
+        description: "Forwarded to deploy-to-balena-action `cache`."
         required: false
         type: boolean
         default: true
       layer_cache:
-        description: 'Forwarded to deploy-to-balena-action `layer_cache`.'
+        description: "Forwarded to deploy-to-balena-action `layer_cache`."
         required: false
         type: boolean
         default: true
       debug:
-        description: 'Forwarded to deploy-to-balena-action `debug`.'
+        description: "Forwarded to deploy-to-balena-action `debug`."
         required: false
         type: boolean
         default: false
@@ -220,22 +220,22 @@ name: Balena Block Publish
           guaranteed to evaluate against a valid label set.
         required: false
         type: string
-        default: ''
+        default: ""
     secrets:
       BALENA_API_TOKEN:
         required: true
     outputs:
       published:
-        description: '`true` when a release was actually pushed to balenaCloud.'
+        description: "`true` when a release was actually pushed to balenaCloud."
         value: ${{ jobs.setup.outputs.publish }}
       version:
-        description: 'Resolved block version.'
+        description: "Resolved block version."
         value: ${{ jobs.setup.outputs.version }}
       fleet:
-        description: 'Resolved `<namespace>/<block_name>` slug.'
+        description: "Resolved `<namespace>/<block_name>` slug."
         value: ${{ jobs.setup.outputs.fleet }}
       release_id:
-        description: 'Balena release id (when publish ran).'
+        description: "Balena release id (when publish ran)."
         value: ${{ jobs.publish.outputs.release_id }}
 
 permissions:
@@ -337,7 +337,7 @@ jobs:
       - name: Resolve version
         id: tags
         if: inputs.auto_resolve_version
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/resolve-docker-image-tags@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/resolve-docker-image-tags@main
         with:
           version_override: ${{ inputs.version }}
           version_source: ${{ inputs.version_source }}
@@ -347,7 +347,7 @@ jobs:
 
       - name: Resolve release context
         id: ctx
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/resolve-release-context@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/resolve-release-context@main
         with:
           publish_override: ${{ inputs.publish }}
           auto_resolve_version: ${{ inputs.auto_resolve_version }}
@@ -466,7 +466,7 @@ jobs:
       # actually built + pushed a new release or short-circuited on
       # an existing one tagged with the same commit SHA. Useful for
       # alerting on unexpected rebuilds in cache-by-SHA flows.
-      cache_hit:  ${{ steps.deploy.outputs.cache_hit }}
+      cache_hit: ${{ steps.deploy.outputs.cache_hit }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -476,21 +476,21 @@ jobs:
 
       - name: Render balena.yml
         if: inputs.generate_balena_yml
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/render-balena-yml@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/render-balena-yml@main
         with:
-          out_path:               ${{ inputs.balena_yml_path }}
-          name:                   ${{ inputs.block_name }}
-          version:                ${{ needs.setup.outputs.version }}
-          block_type:             ${{ inputs.block_type }}
-          description:            ${{ inputs.block_description }}
-          post_provisioning:      ${{ inputs.block_post_provisioning }}
-          assets_repository_url:  ${{ inputs.block_assets_repository_url }}
-          assets_logo_url:        ${{ inputs.block_assets_logo_url }}
-          default_device_type:    ${{ inputs.block_default_device_type }}
+          out_path: ${{ inputs.balena_yml_path }}
+          name: ${{ inputs.block_name }}
+          version: ${{ needs.setup.outputs.version }}
+          block_type: ${{ inputs.block_type }}
+          description: ${{ inputs.block_description }}
+          post_provisioning: ${{ inputs.block_post_provisioning }}
+          assets_repository_url: ${{ inputs.block_assets_repository_url }}
+          assets_logo_url: ${{ inputs.block_assets_logo_url }}
+          default_device_type: ${{ inputs.block_default_device_type }}
           supported_device_types: ${{ inputs.block_supported_device_types }}
-          architectures:          ${{ inputs.block_architectures }}
-          platforms:              ${{ inputs.block_platforms }}
-          image_ref:              ${{ inputs.block_image_ref }}
+          architectures: ${{ inputs.block_architectures }}
+          platforms: ${{ inputs.block_platforms }}
+          image_ref: ${{ inputs.block_image_ref }}
 
       - name: Publish to balenaCloud
         id: deploy
@@ -500,13 +500,13 @@ jobs:
         # socket — the action's `/github/workspace` bind-mount points
         # at a path that only exists inside the runner container, not
         # on the host's read-only rootfs). See
-        # `.github/actions/shared/balena-publish/action.yml` for the
+        # `.github/actions/balena-publish/action.yml` for the
         # full rationale; input contract is a strict subset.
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/balena-publish@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/balena-publish@main
         with:
           balena_token: ${{ secrets.BALENA_API_TOKEN }}
-          fleet:        ${{ needs.setup.outputs.fleet }}
-          source:       ${{ inputs.source }}
+          fleet: ${{ needs.setup.outputs.fleet }}
+          source: ${{ inputs.source }}
           # `force: true` overrides `cache: true` so the action
           # always builds a fresh release even when a release already
           # exists for this commit SHA. `layer_cache` is untouched so
@@ -521,10 +521,10 @@ jobs:
           # it returns false; when force is false it returns whatever
           # `inputs.cache` is set to. Both shapes are stringified by GHA
           # to 'true'/'false' before being passed to the action.
-          cache:        ${{ !inputs.force && inputs.cache }}
-          layer_cache:  ${{ inputs.layer_cache }}
-          debug:        ${{ inputs.debug }}
-          finalize:     ${{ inputs.draft && 'false' || 'true' }}
+          cache: ${{ !inputs.force && inputs.cache }}
+          layer_cache: ${{ inputs.layer_cache }}
+          debug: ${{ inputs.debug }}
+          finalize: ${{ inputs.draft && 'false' || 'true' }}
 
       # Archive the exact `balena.yml` that was pushed to balenaCloud
       # so operators can inspect / diff the resolved manifest after the

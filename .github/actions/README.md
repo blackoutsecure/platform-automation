@@ -3,14 +3,26 @@
 Reusable composite actions consumed by the workflows in this repo and by
 downstream callers that pin to this hub. Layout:
 
-- `shared/<name>/` — consumed by multiple workflows, referenced as
-  `blackoutsecure/bos-automation-hub/.github/actions/shared/<name>@<ref>`.
+- `.github/actions/<name>/` — reusable action modules used by multiple
+  workflows and pinned directly from this hub.
 - `<name>/` — used by one workflow in this repo only.
 
-The shared `resolve-hub-ref` action centralizes the small amount of branch
-routing required by managed kickers. Kicker files should keep only event
-triggers, resolver inputs, static `@dev`/`@main` jobs, and secret inheritance;
+The reusable `resolve-hub-ref` and `universal-config` actions are direct
+infrastructure actions used by the managed kickers. They stay in their
+canonical action directories so the callers keep simple, explicit `uses:`
+references and a single source of truth.
+
+The `resolve-hub-ref` action centralizes the small amount of branch routing
+required by managed kickers. Kicker files should keep only event triggers,
+resolver inputs, static `@dev`/`@main` jobs, and secret inheritance;
 configuration and execution belong in the reusable backend workflow.
+
+The `release-validation` action owns the deterministic release-readiness
+engine used by artifact, Marketplace, and hub runtime releases. It emits
+structured findings for `job-report`; it does not publish, push, or repair the
+candidate in place. Repository-specific extensions are supplied through the
+universal `release_validation` config or the conventional
+`.github/scripts/release-validation.sh` hook.
 
 ## Published orchestration actions
 

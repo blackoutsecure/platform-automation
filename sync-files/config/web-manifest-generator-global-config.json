@@ -1,0 +1,39 @@
+{
+  "web_manifest": {
+    "audit": {
+      "enable": true,
+      "fail_on": "never",
+      "max_size_kb": 128,
+      "rules": {
+        "require_name": "fail",
+        "require_icons": "fail",
+        "require_start_url": "fail",
+        "require_display": "fail",
+        "require_192_icon": "fail",
+        "require_512_icon": "fail",
+        "valid_theme_color": "fail",
+        "valid_background_color": "fail",
+        "valid_display_mode": "fail",
+        "valid_json": "fail",
+        "start_url_in_scope": "fail",
+        "require_short_name": "warn",
+        "require_maskable_icon": "warn",
+        "forbid_any_maskable_combo": "warn",
+        "icon_files_exist": "warn",
+        "valid_orientation": "warn",
+        "require_manifest_link": "warn",
+        "file_size_limit": "warn",
+        "require_id": "warn"
+      }
+    },
+    "reporting": {
+      "step_summary": true,
+      "sarif": true,
+      "json_report": true,
+      "recommendations": true
+    },
+    "remediation": {
+      "enable_ai_findings_summary": false
+    }
+  }
+}

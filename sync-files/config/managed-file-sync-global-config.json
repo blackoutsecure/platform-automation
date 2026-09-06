@@ -7,17 +7,15 @@
       "shellcheck",
       "yamllint",
       "coverage_artifacts",
-      "bos_universal_security_kicker",
-      "bos_universal_sync_kicker"
+      "license_service",
+      "security_readme_pointer",
+      "bos_universal_gatekeeper_kicker"
     ],
     "file_patches": [
       {
         "service": "common",
         "path": ".gitignore",
-        "remove": [
-          ".vscode/*",
-          "!.vscode/extensions.json"
-        ],
+        "remove": [".vscode/*", "!.vscode/extensions.json"],
         "append": [
           ".vscode/",
           "",
@@ -28,67 +26,127 @@
           "*.p12",
           "*.pfx",
           "secrets.*",
-          ".secrets/"
+          "!SECRETS.md",
+          ".secrets/",
+          "",
+          "# Local tool and downloader logs",
+          "debug.log",
+          "wget-log",
+          "wget-log.*"
         ]
       }
     ],
     "service_definitions": {
-      "bos_universal_security_kicker": {
+      "license_service": {
         "mode": "file",
+        "description": "Organization-standard repository license. Repositories with a different approved license must disable this service and provide their own LICENSE.",
         "files": [
           {
-            "path": ".github/workflows/bos-universal-security-kicker.yml",
-            "content_file": "workflows/bos-universal-security-kicker.yml"
+            "path": "LICENSE",
+            "content_file": "legal/LICENSE"
           }
         ]
       },
-      "bos_universal_sync_kicker": {
+      "proprietary_license_service": {
         "mode": "file",
+        "description": "Organization-standard proprietary license, for internal and commercial repositories that are not published as reusable Actions, packages, or libraries. Opt-in: not in the default service list. Both this service and license_service own LICENSE in whole-file mode, so a repository selecting this one MUST also set disabled_services: [license_service] or the sync fails with an ambiguous-ownership error. Repositories using it must not be listed on the GitHub Marketplace, which requires an OSI-approved license.",
         "files": [
           {
-            "path": ".github/workflows/bos-universal-sync-kicker.yml",
-            "content_file": "workflows/bos-universal-sync-kicker.yml"
+            "path": "LICENSE",
+            "content_file": "legal/LICENSE-PROPRIETARY"
           }
         ]
       },
-      "bos_universal_action_test_kicker": {
+      "license_catalogue_service": {
         "mode": "file",
+        "description": "OSI/SPDX licence catalogue plus the shared resolver module, consumed by the marketplace-kit LC### rules and the code-scanning-kit LD### rules. Generated in the hub by scripts/build_osi_catalogue.py so both kits classify a licence identically. The module and the data file are a versioned pair and must move together. Consumers that vendor them at different paths override this definition in their own service_definitions.",
         "files": [
           {
-            "path": ".github/workflows/bos-universal-action-test-kicker.yml",
-            "content_file": "workflows/bos-universal-action-test-kicker.yml"
+            "path": "src/osi-licenses.json",
+            "content_file": "legal/osi-licenses.json"
+          },
+          {
+            "path": "src/osi_catalogue.py",
+            "content_file": "legal/osi_catalogue.py"
           }
         ]
       },
-      "bos_universal_marketplace_kicker": {
-        "mode": "file",
+      "node_ecosystem": {
+        "mode": "block",
+        "description": "Node-ecosystem ignore rules for repositories that build or test with npm, yarn, or pnpm.",
         "files": [
           {
-            "path": ".github/workflows/bos-universal-marketplace-kicker.yml",
-            "content_file": "workflows/bos-universal-marketplace-kicker.yml"
+            "path": ".gitignore",
+            "content_lines": [
+              "npm-debug.log*",
+              "yarn-debug.log*",
+              "yarn-error.log*",
+              ".pnpm-debug.log*",
+              "lerna-debug.log*",
+              ".eslintcache",
+              ".nyc_output/",
+              "*.lcov",
+              "logs/",
+              "*.out",
+              "*.pid",
+              "test-results/",
+              ".test-output/"
+            ]
           }
         ]
       },
-      "bos_universal_upstream_kicker": {
+      "wranglerignore": {
         "mode": "file",
+        "description": "Cloudflare Wrangler deployment exclusions for the Blackout Secure site.",
         "files": [
           {
-            "path": ".github/workflows/bos-universal-upstream-kicker.yml",
-            "content_file": "workflows/bos-universal-upstream-kicker.yml"
+            "path": ".wranglerignore",
+            "content_lines": [
+              "# Managed by https://github.com/blackoutsecure/bos-automation-hub —",
+              "# do not edit. To modify, update the `wranglerignore` service in",
+              "# .github/actions/sync-managed-files/sync.py.",
+              "#",
+              "# Version Control & Development",
+              ".git",
+              ".github",
+              ".gitignore",
+              "",
+              "# IDE & Editor",
+              ".vscode",
+              "",
+              "# Documentation",
+              "README.md"
+            ]
           }
         ]
       },
       "bos_universal_gatekeeper_kicker": {
         "mode": "file",
-        "description": "Central gatekeeper kicker. Also removes the superseded bos-universal-launchpad-kicker.yml so a renamed consumer never ends up running both front doors.",
         "files": [
           {
             "path": ".github/workflows/bos-universal-gatekeeper-kicker.yml",
             "content_file": "workflows/bos-universal-gatekeeper-kicker.yml"
-          },
+          }
+        ]
+      },
+      "security_readme_pointer": {
+        "mode": "block",
+        "description": "Short README pointer to the hub's 'Secrets pipelining strategy' section, instead of duplicating the full generic secrets guide into every repository. Most repositories only need this pointer, not the full guide.",
+        "files": [
           {
-            "path": ".github/workflows/bos-universal-launchpad-kicker.yml",
-            "mode": "absent"
+            "path": "README.md",
+            "content_lines": [
+              "",
+              "## Security & secrets",
+              "",
+              "This repository is built with Blackout Secure's reusable GitHub Actions",
+              "workflows. If you fork or self-host these workflows and need to provision",
+              "your own credentials (GitHub App vs. PAT guidance, secret tiers, Docker",
+              "Hub/Cloudflare/Balena setup walkthroughs), see the",
+              "[\"Secrets pipelining strategy\"](https://github.com/blackoutsecure/bos-automation-hub#secrets-pipelining-strategy)",
+              "section of `bos-automation-hub`. To report a vulnerability, see",
+              "[SECURITY.md](https://github.com/blackoutsecure/.github/blob/main/SECURITY.md)."
+            ]
           }
         ]
       },
@@ -140,7 +198,7 @@
             "content_file": "community-health/SUPPORT.md"
           },
           {
-            "path": "FUNDING.yml",
+            "path": ".github/FUNDING.yml",
             "content_file": "community-health/FUNDING.yml"
           },
           {

@@ -92,7 +92,7 @@ jobs:
           sparse-checkout-cone-mode: false
       - name: Load universal config
         id: config
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/universal-config@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/universal-config@main
         with:
           config_path: .github/bos-universal-config.json
           allow_missing: 'false'

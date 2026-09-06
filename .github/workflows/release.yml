@@ -30,63 +30,63 @@ name: Artifact Release
           for `workflow_dispatch` callers — they must pass the tag through.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Stage toggles --------------------------------------------------
       docker:
-        description: 'Run the docker-build-push stage.'
+        description: "Run the docker-build-push stage."
         required: false
         type: boolean
         default: true
       balena:
-        description: 'Run the balena-block-publish stage.'
+        description: "Run the balena-block-publish stage."
         required: false
         type: boolean
         default: true
       github_release:
-        description: 'Run the github-release publish stage.'
+        description: "Run the github-release publish stage."
         required: false
         type: boolean
         default: true
       companion_docker:
-        description: 'Run the companion docker-build-push stage.'
+        description: "Run the companion docker-build-push stage."
         required: false
         type: boolean
         default: false
 
       # ----- Docker stage inputs -------------------------------------------
       image_name:
-        description: 'Docker image name (no namespace). Required when `docker: true`.'
+        description: "Docker image name (no namespace). Required when `docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       dockerhub_namespace:
-        description: 'Docker Hub namespace. Required when `docker: true`.'
+        description: "Docker Hub namespace. Required when `docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_extra_tags:
-        description: 'Newline-separated extra tags applied to the manifest.'
+        description: "Newline-separated extra tags applied to the manifest."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_short_description:
-        description: 'Docker Hub short description (<=100 chars). Empty leaves it untouched.'
+        description: "Docker Hub short description (<=100 chars). Empty leaves it untouched."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_latest:
-        description: 'Also tag :latest when pushing.'
+        description: "Also tag :latest when pushing."
         required: false
         type: boolean
         default: true
       docker_multi_arch:
-        description: 'Build linux/amd64 + linux/arm64.'
+        description: "Build linux/amd64 + linux/arm64."
         required: false
         type: boolean
         default: true
       docker_update_description:
-        description: 'Sync the README + short description to Docker Hub after a successful push.'
+        description: "Sync the README + short description to Docker Hub after a successful push."
         required: false
         type: boolean
         default: true
@@ -100,20 +100,20 @@ name: Artifact Release
         type: boolean
         default: false
       companion_image_name:
-        description: 'Companion Docker image name (no namespace). Required when `companion_docker: true`.'
+        description: "Companion Docker image name (no namespace). Required when `companion_docker: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       companion_build_target:
-        description: 'Optional Dockerfile stage target for the companion image build.'
+        description: "Optional Dockerfile stage target for the companion image build."
         required: false
         type: string
-        default: ''
+        default: ""
       companion_docker_short_description:
-        description: 'Docker Hub short description for the companion image (<=100 chars). Empty leaves it untouched.'
+        description: "Docker Hub short description for the companion image (<=100 chars). Empty leaves it untouched."
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Docker Scout (forwarded to docker-build-push.yml) -------------
       docker_enable_scout:
@@ -125,30 +125,30 @@ name: Artifact Release
         type: boolean
         default: true
       docker_scout_command:
-        description: 'Scout command (default `cves`). Comma-separated for multiple.'
+        description: "Scout command (default `cves`). Comma-separated for multiple."
         required: false
         type: string
         default: cves
       docker_scout_severities:
-        description: 'Severities to keep.'
+        description: "Severities to keep."
         required: false
         type: string
-        default: 'critical,high'
+        default: "critical,high"
       docker_scout_only_fixed:
-        description: 'Filter to CVEs with a fix available.'
+        description: "Filter to CVEs with a fix available."
         required: false
         type: boolean
         default: false
       docker_scout_ignore_base:
-        description: 'Ignore vulnerabilities inherited from the base image.'
+        description: "Ignore vulnerabilities inherited from the base image."
         required: false
         type: boolean
         default: false
       docker_scout_organization:
-        description: 'Scout organization (Docker Hub namespace). Required for env-related features.'
+        description: "Scout organization (Docker Hub namespace). Required for env-related features."
         required: false
         type: string
-        default: ''
+        default: ""
       docker_scout_record_environment:
         description: >-
           When set, record the published image into this Scout
@@ -156,14 +156,14 @@ name: Artifact Release
           the live release on later PRs.
         required: false
         type: string
-        default: ''
+        default: ""
       docker_scout_sarif_upload:
-        description: 'Upload the SARIF report to GitHub code scanning.'
+        description: "Upload the SARIF report to GitHub code scanning."
         required: false
         type: boolean
         default: true
       docker_scout_exit_code:
-        description: 'Fail the Docker stage if Scout finds matching vulnerabilities.'
+        description: "Fail the Docker stage if Scout finds matching vulnerabilities."
         required: false
         type: boolean
         default: false
@@ -178,22 +178,22 @@ name: Artifact Release
 
       # ----- Balena stage inputs -------------------------------------------
       block_name:
-        description: 'Balena block slug (without namespace). Required when `balena: true`.'
+        description: "Balena block slug (without namespace). Required when `balena: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       balena_namespace:
-        description: 'Balena namespace (user/org). Required when `balena: true`.'
+        description: "Balena namespace (user/org). Required when `balena: true`."
         required: false
         type: string
-        default: ''
+        default: ""
       balena_sync_yml:
-        description: 'Rewrite balena.yml `version:` and commit it back when publishing.'
+        description: "Rewrite balena.yml `version:` and commit it back when publishing."
         required: false
         type: boolean
         default: true
       balena_draft:
-        description: 'Publish as a draft (sets `finalize: false`).'
+        description: "Publish as a draft (sets `finalize: false`)."
         required: false
         type: boolean
         default: false
@@ -230,14 +230,14 @@ name: Artifact Release
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_post_provisioning:
         description: >-
           Rendered `post-provisioning:` Markdown. Multi-line; pass as a
           YAML literal block (`|`). Used only when `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_repository_url:
         description: >-
           `assets.repository.data.url` for the rendered manifest. When
@@ -245,14 +245,14 @@ name: Artifact Release
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_logo_url:
         description: >-
           Optional `assets.logo.data.url`. Must be `https://` when set.
           Used only when `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_default_device_type:
         description: >-
           `data.defaultDeviceType` slug. Optional — when empty, the
@@ -261,7 +261,7 @@ name: Artifact Release
           list either way. Used only when `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_supported_device_types:
         description: >-
           Explicit `data.supportedDeviceTypes` (newline- and/or
@@ -274,31 +274,31 @@ name: Artifact Release
           `balena_generate_yml: true`.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- GitHub Release stage inputs -----------------------------------
       release_template_path:
-        description: 'Path to a Markdown template inside the caller repo. Empty uses the bundled default.'
+        description: "Path to a Markdown template inside the caller repo. Empty uses the bundled default."
         required: false
         type: string
-        default: ''
+        default: ""
       release_extra_context:
-        description: 'Newline-separated `KEY=VALUE` pairs interpolated into the release notes template.'
+        description: "Newline-separated `KEY=VALUE` pairs interpolated into the release notes template."
         required: false
         type: string
-        default: ''
+        default: ""
       generate_release_notes:
         description: "Append GitHub's auto-generated PR/contributor notes after the rendered body."
         required: false
         type: boolean
         default: true
       release_files:
-        description: 'Newline-separated globs of artifacts to attach to the release.'
+        description: "Newline-separated globs of artifacts to attach to the release."
         required: false
         type: string
-        default: ''
+        default: ""
       release_draft:
-        description: 'Create the release as a draft.'
+        description: "Create the release as a draft."
         required: false
         type: boolean
         default: false
@@ -306,41 +306,41 @@ name: Artifact Release
         description: "`true`/`false` to force the pre-release flag. Empty lets the renderer auto-detect from `vX.Y.Z-<suffix>`."
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- Shared / advanced ---------------------------------------------
       platforms:
-        description: 'Platform list reported in release notes (e.g. `linux/amd64,linux/arm64`).'
+        description: "Platform list reported in release notes (e.g. `linux/amd64,linux/arm64`)."
         required: false
         type: string
-        default: 'linux/amd64,linux/arm64'
+        default: "linux/amd64,linux/arm64"
 
     secrets:
       DOCKERHUB_USERNAME:
-        description: 'Docker Hub username. Required when `docker: true`.'
+        description: "Docker Hub username. Required when `docker: true`."
         required: false
       DOCKERHUB_TOKEN:
-        description: 'Docker Hub access token. Required when `docker: true`.'
+        description: "Docker Hub access token. Required when `docker: true`."
         required: false
       BALENA_API_TOKEN:
-        description: 'balenaCloud API token. Required when `balena: true`.'
+        description: "balenaCloud API token. Required when `balena: true`."
         required: false
 
     outputs:
       tag_name:
-        description: 'Resolved release tag (with `v` prefix when present).'
+        description: "Resolved release tag (with `v` prefix when present)."
         value: ${{ jobs.resolve.outputs.tag_name }}
       version:
-        description: 'Resolved version (tag with leading `v` stripped).'
+        description: "Resolved version (tag with leading `v` stripped)."
         value: ${{ jobs.resolve.outputs.version }}
       image:
-        description: 'Fully qualified Docker image reference (when the docker stage ran).'
+        description: "Fully qualified Docker image reference (when the docker stage ran)."
         value: ${{ jobs.docker.outputs.image }}
       companion_image:
-        description: 'Fully qualified companion Docker image reference (when the companion docker stage ran).'
+        description: "Fully qualified companion Docker image reference (when the companion docker stage ran)."
         value: ${{ jobs.docker-companion.outputs.image }}
       release_url:
-        description: 'GitHub Release HTML URL (when the github-release stage ran).'
+        description: "GitHub Release HTML URL (when the github-release stage ran)."
         value: ${{ jobs.github-release.outputs.release_url }}
 
 permissions:
@@ -386,14 +386,14 @@ jobs:
     timeout-minutes: 2
     outputs:
       tag_name: ${{ steps.tag.outputs.value }}
-      version:  ${{ steps.tag.outputs.version }}
+      version: ${{ steps.tag.outputs.version }}
     steps:
       - id: tag
         env:
-          OVERRIDE:    ${{ inputs.tag_name }}
-          EVENT_NAME:  ${{ github.event_name }}
-          REF_TYPE:    ${{ github.ref_type }}
-          REF_NAME:    ${{ github.ref_name }}
+          OVERRIDE: ${{ inputs.tag_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           set -euo pipefail
@@ -443,13 +443,24 @@ jobs:
 
           echo "Resolved tag '${TAG}' (source: ${SOURCE})."
 
+  release-validation:
+    name: Release validation
+    needs: resolve
+    permissions:
+      contents: read
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-release-validation.yml@main
+    with:
+      checkout_ref: ${{ github.sha }}
+      expected_tag: ${{ needs.resolve.outputs.tag_name }}
+      release_kind: artifact
+
   # ---------------------------------------------------------------------------
   # Stage 1 — Docker Hub
   # ---------------------------------------------------------------------------
   docker:
     name: Docker Hub
     if: ${{ inputs.docker }}
-    needs: resolve
+    needs: [resolve, release-validation]
     permissions:
       contents: read
       # Forwarded to docker-build-push.yml so Scout can post PR comments
@@ -460,29 +471,29 @@ jobs:
       security-events: write
     uses: blackoutsecure/bos-automation-hub/.github/workflows/docker-build-push.yml@main
     with:
-      image_name:                ${{ inputs.image_name }}
-      dockerhub_namespace:       ${{ inputs.dockerhub_namespace }}
-      image_version:             ${{ needs.resolve.outputs.version }}
-      push:                      'true'
-      force:                     ${{ inputs.docker_force }}
-      latest:                    ${{ inputs.docker_latest }}
-      multi_arch:                ${{ inputs.docker_multi_arch }}
-      extra_tags:                ${{ inputs.docker_extra_tags }}
-      short_description:         ${{ inputs.docker_short_description }}
-      update_description:        ${{ inputs.docker_update_description }}
-      enable_scout:              ${{ inputs.docker_enable_scout }}
-      scout_command:             ${{ inputs.docker_scout_command }}
-      scout_severities:          ${{ inputs.docker_scout_severities }}
-      scout_only_fixed:          ${{ inputs.docker_scout_only_fixed }}
-      scout_ignore_base:         ${{ inputs.docker_scout_ignore_base }}
-      scout_organization:        ${{ inputs.docker_scout_organization }}
-      scout_record_environment:  ${{ inputs.docker_scout_record_environment }}
-      scout_sarif_upload:        ${{ inputs.docker_scout_sarif_upload }}
-      scout_exit_code:           ${{ inputs.docker_scout_exit_code }}
-      scout_enable_repo:         ${{ inputs.docker_scout_enable_repo }}
+      image_name: ${{ inputs.image_name }}
+      dockerhub_namespace: ${{ inputs.dockerhub_namespace }}
+      image_version: ${{ needs.resolve.outputs.version }}
+      push: "true"
+      force: ${{ inputs.docker_force }}
+      latest: ${{ inputs.docker_latest }}
+      multi_arch: ${{ inputs.docker_multi_arch }}
+      extra_tags: ${{ inputs.docker_extra_tags }}
+      short_description: ${{ inputs.docker_short_description }}
+      update_description: ${{ inputs.docker_update_description }}
+      enable_scout: ${{ inputs.docker_enable_scout }}
+      scout_command: ${{ inputs.docker_scout_command }}
+      scout_severities: ${{ inputs.docker_scout_severities }}
+      scout_only_fixed: ${{ inputs.docker_scout_only_fixed }}
+      scout_ignore_base: ${{ inputs.docker_scout_ignore_base }}
+      scout_organization: ${{ inputs.docker_scout_organization }}
+      scout_record_environment: ${{ inputs.docker_scout_record_environment }}
+      scout_sarif_upload: ${{ inputs.docker_scout_sarif_upload }}
+      scout_exit_code: ${{ inputs.docker_scout_exit_code }}
+      scout_enable_repo: ${{ inputs.docker_scout_enable_repo }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # Stage 1b — Companion Docker Hub image
@@ -490,37 +501,37 @@ jobs:
   docker-companion:
     name: Docker Hub (companion)
     if: ${{ inputs.companion_docker }}
-    needs: resolve
+    needs: [resolve, release-validation]
     permissions:
       contents: read
       pull-requests: write
       security-events: write
     uses: blackoutsecure/bos-automation-hub/.github/workflows/docker-build-push.yml@main
     with:
-      image_name:                ${{ inputs.companion_image_name }}
-      build_target:              ${{ inputs.companion_build_target }}
-      dockerhub_namespace:       ${{ inputs.dockerhub_namespace }}
-      image_version:             ${{ needs.resolve.outputs.version }}
-      push:                      'true'
-      force:                     ${{ inputs.docker_force }}
-      latest:                    ${{ inputs.docker_latest }}
-      multi_arch:                ${{ inputs.docker_multi_arch }}
-      extra_tags:                ${{ inputs.docker_extra_tags }}
-      short_description:         ${{ inputs.companion_docker_short_description }}
-      update_description:        ${{ inputs.docker_update_description }}
-      enable_scout:              ${{ inputs.docker_enable_scout }}
-      scout_command:             ${{ inputs.docker_scout_command }}
-      scout_severities:          ${{ inputs.docker_scout_severities }}
-      scout_only_fixed:          ${{ inputs.docker_scout_only_fixed }}
-      scout_ignore_base:         ${{ inputs.docker_scout_ignore_base }}
-      scout_organization:        ${{ inputs.docker_scout_organization }}
-      scout_record_environment:  ${{ inputs.docker_scout_record_environment }}
-      scout_sarif_upload:        ${{ inputs.docker_scout_sarif_upload }}
-      scout_exit_code:           ${{ inputs.docker_scout_exit_code }}
-      scout_enable_repo:         ${{ inputs.docker_scout_enable_repo }}
+      image_name: ${{ inputs.companion_image_name }}
+      build_target: ${{ inputs.companion_build_target }}
+      dockerhub_namespace: ${{ inputs.dockerhub_namespace }}
+      image_version: ${{ needs.resolve.outputs.version }}
+      push: "true"
+      force: ${{ inputs.docker_force }}
+      latest: ${{ inputs.docker_latest }}
+      multi_arch: ${{ inputs.docker_multi_arch }}
+      extra_tags: ${{ inputs.docker_extra_tags }}
+      short_description: ${{ inputs.companion_docker_short_description }}
+      update_description: ${{ inputs.docker_update_description }}
+      enable_scout: ${{ inputs.docker_enable_scout }}
+      scout_command: ${{ inputs.docker_scout_command }}
+      scout_severities: ${{ inputs.docker_scout_severities }}
+      scout_only_fixed: ${{ inputs.docker_scout_only_fixed }}
+      scout_ignore_base: ${{ inputs.docker_scout_ignore_base }}
+      scout_organization: ${{ inputs.docker_scout_organization }}
+      scout_record_environment: ${{ inputs.docker_scout_record_environment }}
+      scout_sarif_upload: ${{ inputs.docker_scout_sarif_upload }}
+      scout_exit_code: ${{ inputs.docker_scout_exit_code }}
+      scout_enable_repo: ${{ inputs.docker_scout_enable_repo }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # Stage 2 — Balena block
@@ -528,23 +539,23 @@ jobs:
   balena:
     name: Balena block
     if: ${{ inputs.balena }}
-    needs: [resolve, docker]
+    needs: [resolve, release-validation, docker]
     permissions:
-      contents: write   # allow `sync_balena_yml` commit-back
+      contents: write # allow `sync_balena_yml` commit-back
     uses: blackoutsecure/bos-automation-hub/.github/workflows/balena-block-publish.yml@main
     with:
-      block_name:       ${{ inputs.block_name }}
+      block_name: ${{ inputs.block_name }}
       balena_namespace: ${{ inputs.balena_namespace }}
-      version:          ${{ needs.resolve.outputs.version }}
-      publish:          'true'
-      sync_balena_yml:  ${{ inputs.balena_sync_yml }}
-      draft:            ${{ inputs.balena_draft }}
-      force:            ${{ inputs.balena_force }}
-      generate_balena_yml:          ${{ inputs.balena_generate_yml }}
-      block_type:                   ${{ inputs.balena_type }}
-      block_assets_repository_url:  ${{ inputs.balena_repository_url }}
-      block_assets_logo_url:        ${{ inputs.balena_logo_url }}
-      block_default_device_type:    ${{ inputs.balena_default_device_type }}
+      version: ${{ needs.resolve.outputs.version }}
+      publish: "true"
+      sync_balena_yml: ${{ inputs.balena_sync_yml }}
+      draft: ${{ inputs.balena_draft }}
+      force: ${{ inputs.balena_force }}
+      generate_balena_yml: ${{ inputs.balena_generate_yml }}
+      block_type: ${{ inputs.balena_type }}
+      block_assets_repository_url: ${{ inputs.balena_repository_url }}
+      block_assets_logo_url: ${{ inputs.balena_logo_url }}
+      block_default_device_type: ${{ inputs.balena_default_device_type }}
       # When the balena stage runs `generate_balena_yml: true` and the
       # caller did not pass an explicit `balena_supported_device_types`,
       # the renderer derives the device list automatically from (in
@@ -554,7 +565,7 @@ jobs:
       # ran successfully, so a skipped or failed docker stage falls
       # through cleanly to the `platforms` fallback.
       block_image_ref: ${{ needs.docker.result == 'success' && format('{0}:{1}', needs.docker.outputs.image, needs.resolve.outputs.version) || '' }}
-      block_platforms:              ${{ inputs.platforms }}
+      block_platforms: ${{ inputs.platforms }}
       # Long / multi-line passthroughs use `|-` (strip-final-newline) literal
       # blocks so multi-line caller values survive the YAML interpolation
       # without accumulating trailing blank lines at every hop.
@@ -565,7 +576,7 @@ jobs:
       block_supported_device_types: |-
         ${{ inputs.balena_supported_device_types }}
     secrets:
-      BALENA_API_TOKEN:   ${{ secrets.BALENA_API_TOKEN }}
+      BALENA_API_TOKEN: ${{ secrets.BALENA_API_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # Stage 3 — GitHub Release
@@ -579,10 +590,11 @@ jobs:
       && inputs.github_release
       && !cancelled()
       && needs.resolve.result == 'success'
+      && needs.release-validation.result == 'success'
       && (needs.docker.result == 'success' || needs.docker.result == 'skipped')
       && (needs.docker-companion.result == 'success' || needs.docker-companion.result == 'skipped')
       && (needs.balena.result == 'success' || needs.balena.result == 'skipped')
-    needs: [resolve, docker, docker-companion, balena]
+    needs: [resolve, release-validation, docker, docker-companion, balena]
     permissions:
       # `contents: write` to publish the GitHub Release tag/body.
       # `models: read` cascades to the nested `github-release.yml`
@@ -596,14 +608,13 @@ jobs:
       models: read
     uses: blackoutsecure/bos-automation-hub/.github/workflows/github-release.yml@main
     with:
-      tag_name:               ${{ needs.resolve.outputs.tag_name }}
-      version:                ${{ needs.resolve.outputs.version }}
-      image_ref:              ${{ needs.docker.outputs.image }}
-      platforms:              ${{ inputs.platforms }}
-      template_path:          ${{ inputs.release_template_path }}
-      extra_context:          ${{ inputs.release_extra_context }}
-      draft:                  ${{ inputs.release_draft }}
-      prerelease:             ${{ inputs.release_prerelease }}
+      tag_name: ${{ needs.resolve.outputs.tag_name }}
+      version: ${{ needs.resolve.outputs.version }}
+      image_ref: ${{ needs.docker.outputs.image }}
+      platforms: ${{ inputs.platforms }}
+      template_path: ${{ inputs.release_template_path }}
+      extra_context: ${{ inputs.release_extra_context }}
+      draft: ${{ inputs.release_draft }}
+      prerelease: ${{ inputs.release_prerelease }}
       generate_release_notes: ${{ inputs.generate_release_notes }}
-      files:                  ${{ inputs.release_files }}
-
+      files: ${{ inputs.release_files }}

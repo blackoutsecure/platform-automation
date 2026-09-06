@@ -14,15 +14,15 @@ inputs:
   findings:
     description: JSON array of id, severity, control, evidence, remediation, and group objects.
     required: false
-    default: '[]'
+    default: "[]"
   groups:
     description: JSON object mapping group names to title and blurb.
     required: false
-    default: '{}'
+    default: "{}"
   context_rows:
     description: JSON array of label, value, and meaning configuration rows.
     required: false
-    default: '[]'
+    default: "[]"
   automation_policy:
     description: >-
       JSON object describing recommendation, release, promotion, and
@@ -32,7 +32,7 @@ inputs:
   subject:
     description: Optional report subject.
     required: false
-    default: ''
+    default: ""
   fail_on:
     description: fail, warn, or never.
     required: false
@@ -40,15 +40,15 @@ inputs:
   enable_summary:
     description: Write the GitHub Step Summary.
     required: false
-    default: 'true'
+    default: "true"
   enable_annotations:
     description: Emit GitHub error and warning annotations.
     required: false
-    default: 'true'
+    default: "true"
   footer:
     description: Optional report footer text.
     required: false
-    default: ''
+    default: ""
   html_path:
     description: Standalone HTML report path.
     required: false
@@ -56,11 +56,11 @@ inputs:
   enable_html:
     description: Generate the standalone HTML report.
     required: false
-    default: 'true'
+    default: "true"
   enable_pdf:
     description: Attempt PDF export with an installed Chromium or Chrome binary.
     required: false
-    default: 'false'
+    default: "false"
   pdf_path:
     description: Optional PDF report path.
     required: false
@@ -68,7 +68,7 @@ inputs:
   enable_json:
     description: Generate a machine-readable JSON report alongside Markdown/HTML.
     required: false
-    default: 'false'
+    default: "false"
   json_path:
     description: JSON report path.
     required: false
@@ -76,7 +76,7 @@ inputs:
   enable_automation_policy:
     description: Render the "Automation policy" section. Set false for callers with no automation-policy concept.
     required: false
-    default: 'true'
+    default: "true"
   brand_name:
     description: Report byline and footer brand name.
     required: false
@@ -92,7 +92,7 @@ inputs:
   enable_artifact_upload:
     description: Upload the generated HTML/PDF/JSON reports as a workflow artifact.
     required: false
-    default: 'false'
+    default: "false"
   artifact_name:
     description: Artifact name used when enable_artifact_upload is true.
     required: false
@@ -292,9 +292,25 @@ runs:
 
         context_rows = [row for row in context if isinstance(row, dict) and row.get("include") is not False and set_value(row.get("value"))]
         total_parts = [f"{counts[key]} {LABELS[key].lower()}" for key in LABELS if counts[key]]
-        markdown = [f"# {title}", "", f"**Provided by [{brand_name}]({brand_url})**", "", "## Executive summary", "", f"**Verdict:** {verdict}", "", detail, "", f"**Totals:** {' · '.join(total_parts) or 'no findings'}", "", "| Severity | Count | Meaning |", "| -------- | ----- | ------- |"]
-        markdown.extend(f"| {LABELS[key]} | {counts[key]} | {MEANINGS[key]} |" for key in LABELS if counts[key])
-        markdown.append("")
+        attention_tiers = ("fail", "warn", "skip")
+        excluded_tiers = ("not_applicable", "disabled")
+        markdown = [f"# {title}", "", f"**Provided by [{brand_name}]({brand_url})**", "", "## Executive summary", "", f"**Verdict:** {verdict}", "", detail, "", f"**Totals:** {' · '.join(total_parts) or 'no findings'}", ""]
+        if any(counts[key] for key in attention_tiers):
+          markdown += ["### Requires attention", "", "| Status | Count | Meaning |", "| ------ | ----- | ------- |"]
+          markdown.extend(
+            f"| {LABELS[key]} | {counts[key]} | {MEANINGS[key]} |"
+            for key in attention_tiers if counts[key]
+          )
+          markdown.append("")
+        if counts["pass"]:
+          markdown += ["### Controls satisfied", "", "| Status | Count | Meaning |", "| ------ | ----- | ------- |", f"| {LABELS['pass']} | {counts['pass']} | {MEANINGS['pass']} |", ""]
+        if any(counts[key] for key in excluded_tiers):
+          markdown += ["### Out of scope", "", "| Status | Count | Meaning |", "| ------ | ----- | ------- |"]
+          markdown.extend(
+            f"| {LABELS[key]} | {counts[key]} | {MEANINGS[key]} |"
+            for key in excluded_tiers if counts[key]
+          )
+          markdown.append("")
         if context_rows:
             markdown += ["## Configuration used", "", "| Setting | Value | What it means |", "| ------- | ----- | ------------- |"]
             markdown += [f"| {cell(row.get('label'))} | `{cell(row.get('value'))}` | {cell(row.get('meaning'))} |" for row in context_rows]
@@ -412,4 +428,3 @@ runs:
           ${{ steps.report.outputs.json_path }}
         if-no-files-found: ignore
         retention-days: 30
-

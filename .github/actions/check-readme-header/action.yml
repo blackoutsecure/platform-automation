@@ -32,9 +32,9 @@ description: >-
         [![GitHub Stars](...stars badge...)](.../stargazers)
         [![Docker Pulls](...pulls badge...)](.../docker hub...)
         [![GitHub Release](...release badge...)](.../releases)
-        [![Blackout Secure Launchpad](...launchpad badge...)](.../actions/workflows/bos-universal-launchpad-kicker.yml)
+        [![Blackout Secure Gatekeeper](...gatekeeper badge...)](.../actions/workflows/bos-universal-gatekeeper-kicker.yml)
 
-      (Balena Hub badge may substitute for Launchpad on balena-only repos.)
+      (Balena Hub badge may substitute for Gatekeeper on balena-only repos.)
 
   `auto` (default) detects the profile from `action.yml` presence at
   the repo root + `Dockerfile`/`docker-compose.yml` presence:
@@ -271,13 +271,15 @@ runs:
                 "Add \`[![GitHub Release](https://img.shields.io/github/release/${EXPECTED_ORG}/<repo>.svg?style=flat-square&color=E7931D&logo=github&logoColor=FFFFFF)](.../releases)\`"
             fi
 
-            # Launchpad OR Balena Hub badge is acceptable as the 4th.
-            # Both must carry the brand color when present.
-            if grep -qE '\[!\[Blackout Secure Launchpad\]\([^)]*color=E7931D|\[!\[Balena Hub\]\([^)]*-E7931D' <<<"$head_block"; then
-              add_finding "RH025" "pass" "Launchpad-or-Balena badge" "badge found with the correct brand color" "—"
+            # Gatekeeper (or legacy Launchpad) OR Balena Hub badge is
+            # acceptable as the 4th. Both must carry the brand color when
+            # present. The legacy label stays accepted so a repo that has not
+            # yet re-synced its README still passes this gate.
+            if grep -qE '\[!\[Blackout Secure (Gatekeeper|Launchpad)\]\([^)]*color=E7931D|\[!\[Balena Hub\]\([^)]*-E7931D' <<<"$head_block"; then
+              add_finding "RH025" "pass" "Gatekeeper-or-Balena badge" "badge found with the correct brand color" "—"
             else
-              add_finding "RH025" "fail" "Launchpad-or-Balena badge" "badge not found, or missing the brand color" \
-                "Add \`[![Blackout Secure Launchpad](.../bos-universal-launchpad-kicker.yml?style=flat-square&label=blackout%20secure%20launchpad&color=E7931D)](.../bos-universal-launchpad-kicker.yml)\` OR \`[![Balena Hub](https://img.shields.io/badge/balena%20hub-<name>-E7931D?style=flat-square&logo=balena&logoColor=FFFFFF)](https://hub.balena.io/blocks/<id>/<name>)\`"
+              add_finding "RH025" "fail" "Gatekeeper-or-Balena badge" "badge not found, or missing the brand color" \
+                "Add \`[![Blackout Secure Gatekeeper](.../bos-universal-gatekeeper-kicker.yml?style=flat-square&label=blackout%20secure%20gatekeeper&color=E7931D)](.../bos-universal-gatekeeper-kicker.yml)\` OR \`[![Balena Hub](https://img.shields.io/badge/balena%20hub-<name>-E7931D?style=flat-square&logo=balena&logoColor=FFFFFF)](https://hub.balena.io/blocks/<id>/<name>)\`"
             fi
             ;;
 

@@ -4,10 +4,10 @@ name: Blackout Secure Upstream Watcher
   workflow_call:
     inputs:
       upstream_repo:
-        description: 'Upstream repo to watch, as `owner/name`. Required for `source: github_release`, `github_branch_file`, and `github_tags`.'
+        description: "Upstream repo to watch, as `owner/name`. Required for `source: github_release`, `github_branch_file`, and `github_tags`."
         required: false
         type: string
-        default: ''
+        default: ""
       track_file:
         description: >-
           Repo-relative path to the tracking JSON file. Created on first
@@ -22,7 +22,7 @@ name: Blackout Secure Upstream Watcher
           Empty disables dispatching (commit-only mode).
         required: false
         type: string
-        default: ''
+        default: ""
       force_dispatch:
         description: >-
           When `'true'`, dispatch the target workflows even if the upstream
@@ -30,7 +30,7 @@ name: Blackout Secure Upstream Watcher
           that want to re-trigger downstream pipelines on demand.
         required: false
         type: string
-        default: 'false'
+        default: "false"
       source:
         description: >-
           Where to read the upstream version from. Delegated to the
@@ -63,7 +63,7 @@ name: Blackout Secure Upstream Watcher
           that mode, ignored otherwise.
         required: false
         type: string
-        default: ''
+        default: ""
       version_file_path:
         description: >-
           Repo-relative path inside the upstream branch whose raw contents are
@@ -72,7 +72,7 @@ name: Blackout Secure Upstream Watcher
           and similar projects.
         required: false
         type: string
-        default: 'version'
+        default: "version"
       image_ref:
         description: >-
           Container image reference. Required when `source: container_image`.
@@ -83,26 +83,26 @@ name: Blackout Secure Upstream Watcher
           registries are rejected with an explicit error.
         required: false
         type: string
-        default: ''
+        default: ""
       package_name:
         description: >-
           Package name for `source: npm` (scoped names allowed) or
           `source: pypi`.
         required: false
         type: string
-        default: ''
+        default: ""
       version_url:
-        description: 'URL to fetch when `source: generic_url`.'
+        description: "URL to fetch when `source: generic_url`."
         required: false
         type: string
-        default: ''
+        default: ""
       version_regex:
         description: >-
           Python regex applied to the `version_url` body. The first capture
           group is taken as the version. Required when `source: generic_url`.
         required: false
         type: string
-        default: ''
+        default: ""
       tag_pattern:
         description: >-
           Optional regex used to filter candidate tags/versions for
@@ -111,7 +111,7 @@ name: Blackout Secure Upstream Watcher
           accepts `[v]X.Y.Z[-suffix]`.
         required: false
         type: string
-        default: ''
+        default: ""
       include_prereleases:
         description: >-
           When `'true'`, `source: github_release` lists
@@ -122,9 +122,9 @@ name: Blackout Secure Upstream Watcher
           `releases/latest` behavior. Ignored for all other providers.
         required: false
         type: string
-        default: 'false'
+        default: "false"
       strip_v_prefix:
-        description: 'Strip a leading `v` from the upstream tag before storing it.'
+        description: "Strip a leading `v` from the upstream tag before storing it."
         required: false
         type: boolean
         default: true
@@ -134,19 +134,19 @@ name: Blackout Secure Upstream Watcher
           placeholders.
         required: false
         type: string
-        default: 'chore(ci): track {repo} {version}'
+        default: "chore(ci): track {repo} {version}"
       git_user_name:
-        description: 'Git author name for the tracking-file commit.'
+        description: "Git author name for the tracking-file commit."
         required: false
         type: string
-        default: 'github-actions[bot]'
+        default: "github-actions[bot]"
       git_user_email:
-        description: 'Git author email for the tracking-file commit.'
+        description: "Git author email for the tracking-file commit."
         required: false
         type: string
-        default: '41898282+github-actions[bot]@users.noreply.github.com'
+        default: "41898282+github-actions[bot]@users.noreply.github.com"
       push_retries:
-        description: 'Retry attempts for the `git push` (handles concurrent commits).'
+        description: "Retry attempts for the `git push` (handles concurrent commits)."
         required: false
         type: number
         default: 3
@@ -170,15 +170,18 @@ name: Blackout Secure Upstream Watcher
           Ignored for `source: container_image` / `npm` / `pypi` /
           `generic_url`, which do not call the GitHub API.
         required: false
+      GATEWALL_APP_PRIVATE_KEY:
+        description: Private key for the reusable Gatewall automation GitHub App.
+        required: false
     outputs:
       changed:
-        description: '`true` when the upstream version differed from the tracked file.'
+        description: "`true` when the upstream version differed from the tracked file."
         value: ${{ jobs.monitor.outputs.changed }}
       upstream_version:
-        description: 'Latest upstream version (with `v` stripped when `strip_v_prefix` is true).'
+        description: "Latest upstream version (with `v` stripped when `strip_v_prefix` is true)."
         value: ${{ jobs.monitor.outputs.upstream_version }}
       upstream_tag:
-        description: 'Raw upstream tag name (always with `v` if upstream uses one).'
+        description: "Raw upstream tag name (always with `v` if upstream uses one)."
         value: ${{ jobs.monitor.outputs.upstream_tag }}
       upstream_commit:
         description: >-
@@ -186,7 +189,7 @@ name: Blackout Secure Upstream Watcher
           to a commit (`container_image`, `npm`, `pypi`, `generic_url`).
         value: ${{ jobs.monitor.outputs.upstream_commit }}
       upstream_source_url:
-        description: 'URL that was consulted, for traceability.'
+        description: "URL that was consulted, for traceability."
         value: ${{ jobs.monitor.outputs.upstream_source_url }}
       upstream_label:
         description: >-
@@ -198,16 +201,16 @@ name: Blackout Secure Upstream Watcher
           fallback chain.
         value: ${{ jobs.monitor.outputs.upstream_label }}
       upstream_release_url:
-        description: '`source: github_release` only. HTML URL of the GitHub Release.'
+        description: "`source: github_release` only. HTML URL of the GitHub Release."
         value: ${{ jobs.monitor.outputs.upstream_release_url }}
       upstream_release_name:
-        description: '`source: github_release` only. Release display name (may differ from the tag).'
+        description: "`source: github_release` only. Release display name (may differ from the tag)."
         value: ${{ jobs.monitor.outputs.upstream_release_name }}
       upstream_release_body:
-        description: '`source: github_release` only. Markdown release notes (multi-line).'
+        description: "`source: github_release` only. Markdown release notes (multi-line)."
         value: ${{ jobs.monitor.outputs.upstream_release_body }}
       upstream_published_at:
-        description: '`source: github_release` only. ISO 8601 publication timestamp.'
+        description: "`source: github_release` only. ISO 8601 publication timestamp."
         value: ${{ jobs.monitor.outputs.upstream_published_at }}
       upstream_previous_version:
         description: Version recorded in the tracker before this run.
@@ -228,7 +231,7 @@ name: Blackout Secure Upstream Watcher
         description: Compact watcher package metadata JSON.
         value: ${{ jobs.monitor.outputs.upstream_metadata }}
       dispatched:
-        description: 'Newline-separated list of workflows actually dispatched.'
+        description: "Newline-separated list of workflows actually dispatched."
         value: ${{ jobs.monitor.outputs.dispatched }}
 
 permissions:
@@ -291,6 +294,29 @@ jobs:
       upstream_metadata: ${{ steps.discover.outputs.metadata }}
       dispatched: ${{ steps.dispatch.outputs.dispatched }}
     steps:
+      - name: Mint upstream read token
+        id: upstream-app
+        if: vars.GATEWALL_APP_ID != '' && startsWith(inputs.upstream_repo, format('{0}/', github.repository_owner))
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.GATEWALL_APP_ID }}
+          private-key: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ inputs.upstream_repo }}
+          permission-contents: read
+
+      - name: Mint dispatch token
+        id: dispatch-app
+        if: vars.GATEWALL_APP_ID != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.GATEWALL_APP_ID }}
+          private-key: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-actions: write
+          permission-contents: read
+
       - name: Preflight validation
         env:
           TRACK_FILE: ${{ inputs.track_file }}
@@ -352,24 +378,24 @@ jobs:
 
       - name: Discover upstream version
         id: discover
-        uses: blackoutsecure/bos-upstream-watcher@c91a6fd7d42161f1b37ab6da12ca6a6bbaabe739 # dev
+        uses: blackoutsecure/bos-upstream-watcher@1a336966520af363c9b76cdd34c0f1443b723179 # v1.1.3
         with:
           config_path: .github/bos-universal-config.json
           global_config_path: hub-config/sync-files/config/upstream-watcher-global-config.json
-          use_global_config: 'auto'
-          source:              ${{ inputs.source }}
-          upstream_repo:       ${{ inputs.upstream_repo }}
-          upstream_branch:     ${{ inputs.upstream_branch }}
-          version_file_path:   ${{ inputs.version_file_path }}
-          image_ref:           ${{ inputs.image_ref }}
-          package_name:        ${{ inputs.package_name }}
-          version_url:         ${{ inputs.version_url }}
-          version_regex:       ${{ inputs.version_regex }}
-          tag_pattern:         ${{ inputs.tag_pattern }}
+          use_global_config: "auto"
+          source: ${{ inputs.source }}
+          upstream_repo: ${{ inputs.upstream_repo }}
+          upstream_branch: ${{ inputs.upstream_branch }}
+          version_file_path: ${{ inputs.version_file_path }}
+          image_ref: ${{ inputs.image_ref }}
+          package_name: ${{ inputs.package_name }}
+          version_url: ${{ inputs.version_url }}
+          version_regex: ${{ inputs.version_regex }}
+          tag_pattern: ${{ inputs.tag_pattern }}
           include_prereleases: ${{ inputs.include_prereleases }}
-          strip_v_prefix:      ${{ inputs.strip_v_prefix }}
-          tracker_path:        ${{ inputs.track_file }}
-          github_token:        ${{ secrets.UPSTREAM_TOKEN || github.token }}
+          strip_v_prefix: ${{ inputs.strip_v_prefix }}
+          tracker_path: ${{ inputs.track_file }}
+          github_token: ${{ steps.upstream-app.outputs.token || secrets.UPSTREAM_TOKEN || github.token }}
 
       # Dispatch happens BEFORE the commit so a transient dispatch failure
       # leaves the marker file unchanged and the next scheduled run retries.
@@ -377,7 +403,7 @@ jobs:
         id: dispatch
         if: steps.discover.outputs.changed == 'true' || inputs.force_dispatch == 'true'
         env:
-          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN || github.token }}
+          GH_TOKEN: ${{ steps.dispatch-app.outputs.token || secrets.DISPATCH_TOKEN || github.token }}
           REPO: ${{ github.repository }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           TARGET_WORKFLOWS: ${{ inputs.target_workflows }}
@@ -433,7 +459,7 @@ jobs:
 
       - name: Commit and push tracking file
         if: steps.discover.outputs.changed == 'true'
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/commit-and-push@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/commit-and-push@main
         with:
           files: ${{ inputs.track_file }}
           message: ${{ steps.msg.outputs.value }}

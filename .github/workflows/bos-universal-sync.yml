@@ -2,7 +2,7 @@
 # The sync engine and service catalog live in bos-managed-file-sync-action.
 # Named "managed file sync", not "universal", since it only ever does one
 # thing; filename stays bos-universal-sync.yml to keep uses: refs stable.
-name: '[RUNTIME] Blackout Secure Managed File Sync'
+name: "[RUNTIME] Blackout Secure Managed File Sync"
 
 "on":
   workflow_call:
@@ -11,24 +11,24 @@ name: '[RUNTIME] Blackout Secure Managed File Sync'
         description: Optional service override passed to the published sync action.
         required: false
         type: string
-        default: ''
+        default: ""
       mode:
         description: Optional `commit` or `check` override.
         required: false
         type: string
-        default: ''
+        default: ""
       commit_message:
         description: Optional explicit commit message override.
         required: false
         type: string
-        default: 'chore: sync managed files'
+        default: "chore: sync managed files"
       runs_on:
         description: >-
           Optional runner override. Defaults to
           `organization.workflows.sync.runs_on` from the universal config.
         required: false
         type: string
-        default: ''
+        default: ""
       timeout_minutes:
         description: >-
           Optional per-job timeout override. `0` (default) defers to
@@ -51,9 +51,12 @@ name: '[RUNTIME] Blackout Secure Managed File Sync'
           workflow files are skipped; every other managed file still
           syncs normally with GITHUB_TOKEN.
         required: false
+      GATEWALL_APP_PRIVATE_KEY:
+        description: Private key for the reusable Gatewall automation GitHub App.
+        required: false
     outputs:
       changed:
-        description: '`true` when files changed or would change.'
+        description: "`true` when files changed or would change."
         value: ${{ jobs.sync.outputs.changed }}
       changed_files:
         description: Newline-separated changed file list.
@@ -87,7 +90,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: blackoutsecure/bos-automation-hub
-          ref: ${{ inputs.hub_ref != 'auto' && inputs.hub_ref || (github.event_name == 'pull_request' && github.base_ref || github.event_name == 'merge_group' && github.event.merge_group.base_ref || github.ref_name == 'dev' && 'dev' || 'main') }}
+          ref: ${{ inputs.hub_ref != 'auto' && inputs.hub_ref || (github.event_name == 'pull_request' && github.base_ref || github.event_name == 'merge_group' && github.event.merge_group.base_ref || github.ref_name == 'main' && 'main' || 'dev') }}
           path: hub-runtime
           sparse-checkout: .github/actions/universal-config
           sparse-checkout-cone-mode: false
@@ -95,7 +98,7 @@ jobs:
         id: config
         uses: ./hub-runtime/.github/actions/universal-config
         with:
-          allow_missing: 'true'
+          allow_missing: "true"
 
   sync:
     needs: resolve-config
@@ -112,16 +115,31 @@ jobs:
       changed_files: ${{ steps.sync.outputs.changed_files }}
       commit_sha: ${{ steps.commit.outputs.commit_sha }}
     steps:
+      - name: Mint workflow synchronization token
+        id: workflow-app
+        if: vars.GATEWALL_APP_ID != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.GATEWALL_APP_ID }}
+          private-key: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+          permission-workflows: write
+
       - name: Resolve workflow sync capability
         id: workflow-pat
         env:
+          HAS_WORKFLOW_APP: ${{ steps.workflow-app.outputs.token != '' && 'true' || 'false' }}
           HAS_WORKFLOW_PAT: ${{ secrets.WORKFLOW_SYNC_PAT != '' && 'true' || 'false' }}
-        run: echo "has_pat=${HAS_WORKFLOW_PAT}" >> "${GITHUB_OUTPUT}"
+        run: |
+          echo "has_token=$([[ "${HAS_WORKFLOW_APP}" = 'true' || "${HAS_WORKFLOW_PAT}" = 'true' ]] && echo true || echo false)" >> "${GITHUB_OUTPUT}"
 
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ secrets.WORKFLOW_SYNC_PAT || github.token }}
+          token: ${{ steps.workflow-app.outputs.token || secrets.WORKFLOW_SYNC_PAT || github.token }}
           fetch-depth: 0
           persist-credentials: true
 
@@ -129,7 +147,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: blackoutsecure/bos-automation-hub
-          ref: ${{ inputs.hub_ref != 'auto' && inputs.hub_ref || (github.event_name == 'pull_request' && github.base_ref || github.event_name == 'merge_group' && github.event.merge_group.base_ref || github.ref_name == 'dev' && 'dev' || 'main') }}
+          ref: ${{ inputs.hub_ref != 'auto' && inputs.hub_ref || (github.event_name == 'pull_request' && github.base_ref || github.event_name == 'merge_group' && github.event.merge_group.base_ref || github.ref_name == 'main' && 'main' || 'dev') }}
           path: hub-source
           fetch-depth: 1
           persist-credentials: false
@@ -147,34 +165,34 @@ jobs:
 
       - name: Sync configured services
         id: sync
-        uses: blackoutsecure/bos-managed-file-sync-action@ec3701f92a86d220fc0c3c8327624315ce0c98fa # dev
+        uses: blackoutsecure/bos-managed-file-sync-action@c176d7c1def5f5b72cd3d45b8c5bd73c157187ef # v1.0.24
         with:
           # The action auto-discovers .github/bos-universal-config.json.
-          use_global_config: 'auto'
+          use_global_config: "auto"
           global_config_path: hub-source/sync-files/config/managed-file-sync-global-config.json
           managed_files_path: hub-source/sync-files
           config_json: >-
             ${{
-              steps.workflow-pat.outputs.has_pat != 'true'
+              steps.workflow-pat.outputs.has_token != 'true'
               && '{"managed_file_sync":{"disabled_services":["bos_universal_security_kicker","bos_universal_sync_kicker"]}}'
               || ''
             }}
           services: ${{ inputs.services }}
           dry_run: ${{ (inputs.mode || 'commit') == 'check' }}
           fail_on_drift: ${{ (inputs.mode || 'commit') == 'check' }}
-          show_diff: 'true'
+          show_diff: "true"
 
       - name: Note workflow sync skip
-        if: steps.workflow-pat.outputs.has_pat != 'true'
+        if: steps.workflow-pat.outputs.has_token != 'true'
         run: |
-          echo "::notice::Managed kicker workflow files were not updated because \`workflow_sync_pat\` was not provided. GITHUB_TOKEN can never write to .github/workflows/**; other managed files still synced normally."
+          echo "::notice::Managed kicker workflow files were not updated because no workflow-sync App token or legacy PAT was provided. Other managed files still synced normally."
 
       - name: Commit and push
         id: commit
         if: >-
           (inputs.mode || 'commit') == 'commit'
           && steps.sync.outputs.changed == 'true'
-        uses: ./hub-source/.github/actions/shared/commit-and-push
+        uses: ./hub-source/.github/actions/commit-and-push
         with:
           files: ${{ steps.sync.outputs.changed_files }}
           message: "${{ inputs.commit_message || 'chore: sync managed files' }}"
@@ -188,7 +206,7 @@ jobs:
           CHANGED: ${{ steps.sync.outputs.changed }}
           CHANGED_FILES: ${{ steps.sync.outputs.changed_files }}
           COMMIT_SHA: ${{ steps.commit.outputs.commit_sha }}
-          HAS_PAT: ${{ steps.workflow-pat.outputs.has_pat }}
+          HAS_SYNC_TOKEN: ${{ steps.workflow-pat.outputs.has_token }}
           RUNS_ON: ${{ toJSON(fromJSON(needs.resolve-config.outputs.org).workflows.sync.runs_on) }}
           REPORTING: ${{ toJSON(fromJSON(needs.resolve-config.outputs.org).reporting) }}
           CONFIG: ${{ needs.resolve-config.outputs.config }}
@@ -208,7 +226,7 @@ jobs:
               if line.strip()
           ]
           commit_sha = (os.environ.get("COMMIT_SHA") or "").strip()
-          has_pat = (os.environ.get("HAS_PAT") or "false").lower() == "true"
+          has_sync_token = (os.environ.get("HAS_SYNC_TOKEN") or "false").lower() == "true"
 
           findings = []
           if sync_result == "success":
@@ -268,24 +286,24 @@ jobs:
           findings.append({
               "id": "MS020",
               "severity": (
-                "skip" if not has_pat else
+                "skip" if not has_sync_token else
                 "pass" if sync_result == "success" else
                 "warn"
               ),
               "group": "credentials",
               "control": "Workflow-file sync capability",
               "evidence": (
-                "`workflow_sync_pat` present and workflow services completed successfully"
-                if has_pat and sync_result == "success" else
-                "`workflow_sync_pat` present, but sync did not complete; workflow-file state is unverified"
-                if has_pat else
-                  "`workflow_sync_pat` absent; managed kicker workflows were skipped"
+                "workflow-sync App token or legacy PAT available; workflow services completed successfully"
+                if has_sync_token and sync_result == "success" else
+                "workflow-sync credential available, but sync did not complete; workflow-file state is unverified"
+                if has_sync_token else
+                  "workflow-sync credential absent; managed kicker workflows were skipped"
               ),
               "remediation": (
-                "—" if has_pat and sync_result == "success" else
+                "—" if has_sync_token and sync_result == "success" else
                 "Review and fix the sync-engine failure, then rerun in `commit` mode to verify managed workflow files."
-                if has_pat else
-                  "Add a `WORKFLOW_SYNC_PAT` secret with `Workflows: write`. "
+                if has_sync_token else
+                  "Configure the Gatewall GitHub App profile with `Workflows: write`. "
                   "GITHUB_TOKEN can never write to `.github/workflows/**`."
               ),
           })
@@ -360,7 +378,7 @@ jobs:
 
       - name: Publish managed file sync report
         if: ${{ always() }}
-        uses: ./hub-source/.github/actions/shared/job-report
+        uses: ./hub-source/.github/actions/job-report
         with:
           title: ${{ steps.findings.outputs.title_prefix }} Managed File Sync Report
           subject: >-

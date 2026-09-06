@@ -1,0 +1,80 @@
+name: Resolve latest action ref
+author: Blackout Secure
+description: >-
+  Resolve the newest published version of a GitHub repository and emit both
+  the tag and its dereferenced commit SHA. Stable releases and pre-releases
+  are ranked together by SemVer precedence, so the answer is correct whether
+  the newest version happens to be a pre-release or a stable release.
+
+  This exists because `GET /releases/latest` silently EXCLUDES pre-releases:
+  on a repo whose newest version is a pre-release it returns an older stable
+  release. Every first-party Blackout Secure action currently ships its
+  newest version as a pre-release, so that endpoint is the wrong tool here.
+
+inputs:
+  repository:
+    description: '`owner/name` of the repository to resolve.'
+    required: true
+  channel:
+    description: >-
+      `auto` (default) ranks stable releases and pre-releases together and
+      returns whichever is genuinely newest. `stable` ignores pre-releases.
+      `prerelease` considers only pre-releases.
+    required: false
+    default: 'auto'
+  source:
+    description: >-
+      `releases` reads the Releases API, `tags` reads the git tag list, and
+      `auto` (default) prefers Releases and falls back to tags when the
+      repository has published no matching release.
+    required: false
+    default: 'auto'
+  tag_pattern:
+    description: >-
+      Python regex a tag must match before it is ranked. The default accepts
+      `X.Y.Z` with an optional `v` prefix and an optional SemVer
+      pre-release / build suffix.
+    required: false
+    default: '^v?\d+\.\d+\.\d+([-+][0-9A-Za-z.-]+)?$'
+  github_token:
+    description: >-
+      Token used for the Releases / tags API reads. Leave blank to use the
+      workflow's built-in `GITHUB_TOKEN`.
+    required: false
+    default: ''
+
+outputs:
+  tag:
+    description: Newest tag name, verbatim (for example `v1.0.37`).
+    value: ${{ steps.resolve.outputs.tag }}
+  sha:
+    description: Dereferenced commit SHA for `tag` (annotated tags are peeled).
+    value: ${{ steps.resolve.outputs.sha }}
+  is_prerelease:
+    description: '`true` when the winning version is flagged as a pre-release.'
+    value: ${{ steps.resolve.outputs.is_prerelease }}
+  published_at:
+    description: ISO-8601 publish timestamp, empty when resolved from tags.
+    value: ${{ steps.resolve.outputs.published_at }}
+  html_url:
+    description: Release page URL, empty when resolved from tags.
+    value: ${{ steps.resolve.outputs.html_url }}
+  source:
+    description: Which path produced the answer — `releases` or `tags`.
+    value: ${{ steps.resolve.outputs.source }}
+
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        INPUT_REPOSITORY: ${{ inputs.repository }}
+        INPUT_CHANNEL: ${{ inputs.channel }}
+        INPUT_SOURCE: ${{ inputs.source }}
+        INPUT_TAG_PATTERN: ${{ inputs.tag_pattern }}
+        # Resolved at step scope, not as an input default: action manifest
+        # scalars are evaluated when the manifest loads, where the `secrets`
+        # context does not exist.
+        GITHUB_TOKEN: ${{ inputs.github_token || github.token }}
+      run: python3 "${GITHUB_ACTION_PATH}/resolve.py"

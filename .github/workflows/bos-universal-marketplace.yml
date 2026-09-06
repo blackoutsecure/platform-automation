@@ -35,11 +35,16 @@
 # this workflow for pull requests, development-branch pushes, and optional
 # one-shot manual checks. Generic lint and security run independently through
 # `bos-universal-security-kicker.yml`.
-name: '[RUNTIME] Blackout Secure Universal Marketplace'
+name: "[RUNTIME] Blackout Secure Universal Marketplace"
 
 "on":
   workflow_call:
     inputs:
+      checkout_ref:
+        description: Branch, tag, or SHA to validate. Empty uses the triggering ref.
+        required: false
+        type: string
+        default: ""
       # ----- check -----------------------------------------------------------
       action_yml_path:
         description: >-
@@ -47,7 +52,7 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           at the repo root.
         required: false
         type: string
-        default: 'action.yml'
+        default: "action.yml"
       fail_on_warning:
         description: >-
           `true` to treat OP### (operational best-practice) warnings
@@ -63,7 +68,7 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           compliance gradually.
         required: false
         type: string
-        default: ''
+        default: ""
       check_org_health:
         description: >-
           `true` (default) to consult the org `.github` repo for
@@ -79,42 +84,42 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           `<repository_owner>/.github` inside the kit composite.
         required: false
         type: string
-        default: ''
+        default: ""
       require_security:
-        description: 'Policy override for SECURITY.md (SC003). `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for SECURITY.md (SC003). `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_code_of_conduct:
-        description: 'Policy override for CODE_OF_CONDUCT.md. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for CODE_OF_CONDUCT.md. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_contributing:
-        description: 'Policy override for CONTRIBUTING.md. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for CONTRIBUTING.md. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_support:
-        description: 'Policy override for SUPPORT.md. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for SUPPORT.md. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_issue_templates:
-        description: 'Policy override for `.github/ISSUE_TEMPLATE/`. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for `.github/ISSUE_TEMPLATE/`. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_pr_template:
-        description: 'Policy override for `.github/PULL_REQUEST_TEMPLATE.md`. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for `.github/PULL_REQUEST_TEMPLATE.md`. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_funding:
-        description: 'Policy override for `.github/FUNDING.yml`. `fail` | `warn` | `skip`; empty uses config.'
+        description: "Policy override for `.github/FUNDING.yml`. `fail` | `warn` | `skip`; empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- community-health source mode (where each file lives) ---------
       # Lets callers express *where* each community-health file is expected
@@ -124,96 +129,98 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
       #   * `local`   — file must be in this repo (org fallback disabled).
       #   * `inherit` — file expected at `${org_health_repo}`; local copy
       #                 is intentionally absent and NOT consulted.
-      #   * `either`  — local first, fall back to org (default, back-compat).
+      #   * `either`  — local first, fall back to org (default).
       community_health_source:
         description: >-
           Global default source for CH/SC files. `local` | `inherit` |
-          `either`. Default `either` (back-compat). Override per-rule with
-          the `*_source` inputs below.
+          `either`. Default `either`. Override per-rule with the `*_source`
+          inputs below.
         required: false
         type: string
-        default: 'either'
+        default: "either"
       security_source:
-        description: 'Per-rule source for SECURITY.md (SC003). Empty = use global.'
+        description: "Per-rule source for SECURITY.md (SC003). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       code_of_conduct_source:
-        description: 'Per-rule source for CODE_OF_CONDUCT.md (CH001). Empty = use global.'
+        description: "Per-rule source for CODE_OF_CONDUCT.md (CH001). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       contributing_source:
-        description: 'Per-rule source for CONTRIBUTING.md (CH002). Empty = use global.'
+        description: "Per-rule source for CONTRIBUTING.md (CH002). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       support_source:
-        description: 'Per-rule source for SUPPORT.md (CH003). Empty = use global.'
+        description: "Per-rule source for SUPPORT.md (CH003). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       issue_templates_source:
-        description: 'Per-rule source for issue templates (CH004). Empty = use global.'
+        description: "Per-rule source for issue templates (CH004). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       pr_template_source:
-        description: 'Per-rule source for PR template (CH005). Empty = use global.'
+        description: "Per-rule source for PR template (CH005). Empty = use global."
         required: false
         type: string
-        default: ''
+        default: ""
       funding_source:
-        description: 'Per-rule source for FUNDING.yml (CH006). Empty = use global.'
+        description: >-
+          Per-rule source for `.github/FUNDING.yml` (CH006, and SP002
+          sponsor-button wiring). Empty = use global.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- DP/CQ/LT/GH/MS/SR rules (new families added in kit v0.2.0+) -
       # Same `fail | warn | skip` semantics as the CH/SC rules above.
-      # Defaults follow the kit's own defaults — back-compat additive.
+      # Defaults follow the kit's own defaults.
       require_dependabot:
-        description: 'Policy override for `.github/dependabot.yml` presence (DP001); empty uses config.'
+        description: "Policy override for `.github/dependabot.yml` presence (DP001); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_codeql:
-        description: 'Policy override for a CodeQL workflow (CQ001); empty uses config.'
+        description: "Policy override for a CodeQL workflow (CQ001); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_editorconfig:
-        description: 'Policy override for `.editorconfig` presence (LT001); empty uses config.'
+        description: "Policy override for `.editorconfig` presence (LT001); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_gitattributes:
-        description: 'Policy override for `.gitattributes` presence (LT002); empty uses config.'
+        description: "Policy override for `.gitattributes` presence (LT002); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_gitignore:
-        description: 'Policy override for `.gitignore` presence (LT003); empty uses config.'
+        description: "Policy override for `.gitignore` presence (LT003); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_markdownlint:
-        description: 'Policy override for markdownlint config presence (LT004); empty uses config.'
+        description: "Policy override for markdownlint config presence (LT004); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_yamllint:
-        description: 'Policy override for yamllint config presence (LT005); empty uses config.'
+        description: "Policy override for yamllint config presence (LT005); empty uses config."
         required: false
         type: string
-        default: ''
+        default: ""
       require_ghas_code_scanning:
         description: >-
           Policy for code-scanning enabled at repo level (GH001). Requires
           `github_token` with `metadata: read`. Default `warn`.
         required: false
         type: string
-        default: ''
+        default: ""
       require_ghas_secret_scanning:
         description: >-
           Policy for secret-scanning enabled at repo level (GH002).
@@ -221,28 +228,28 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           `security_and_analysis`. Default `warn`.
         required: false
         type: string
-        default: ''
+        default: ""
       require_dependabot_alerts:
         description: >-
           Policy for Dependabot alerts enabled at repo level (GH003).
           Requires `github_token` with `Administration: read`. Default `warn`.
         required: false
         type: string
-        default: ''
+        default: ""
       require_security_devops:
         description: >-
           Policy for a Microsoft Security DevOps workflow being present
           (MS001). Opt-in. Default `skip`.
         required: false
         type: string
-        default: ''
+        default: ""
       require_scorecard:
         description: >-
           Policy for an OpenSSF Scorecard workflow being present (SR001).
           Opt-in. Default `skip`.
         required: false
         type: string
-        default: ''
+        default: ""
 
       # ----- name-check (opt-in) --------------------------------------------
       run_name_check:
@@ -262,7 +269,7 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           `run_name_check: true`.
         required: false
         type: string
-        default: ''
+        default: ""
       name_check_fail_on_collision:
         description: >-
           `true` (default) to fail the job on any collision; `false`
@@ -288,14 +295,14 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
           from. Default `v4.28.0` (the snapshot Marketplace uses).
         required: false
         type: string
-        default: 'v4.28.0'
+        default: "v4.28.0"
       branding_preview_artifact_name:
         description: >-
           Artifact name for the uploaded SVG card. Default
           `marketplace-card`.
         required: false
         type: string
-        default: 'marketplace-card'
+        default: "marketplace-card"
       branding_preview_artifact_retention_days:
         description: >-
           Artifact retention. Default `14`.
@@ -305,7 +312,7 @@ name: '[RUNTIME] Blackout Secure Universal Marketplace'
 
     outputs:
       check_passed:
-        description: '`true` when the kit `check` step completed without failures.'
+        description: "`true` when the kit `check` step completed without failures."
         value: ${{ jobs.check.outputs.check_passed }}
       name_check_collision:
         description: >-
@@ -345,6 +352,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.checkout_ref || github.sha }}
           persist-credentials: false
 
       - name: Checkout Marketplace Kit global policy
@@ -363,44 +371,44 @@ jobs:
         # Kit `check` composite. SHA-pinned per the hub GHA pin
         # policy. Dependabot bumps in lockstep with the guard +
         # promote pins.
-        uses: blackoutsecure/bos-marketplace-kit/.github/actions/check@5424e908ce6778cd8eb0d97da5264ddc34fc5f0d # v0.1.24
+        uses: blackoutsecure/bos-marketplace-kit/.github/actions/check@c3ca87e5c5c9d72237ce8ff426a759b0f878de91 # v0.1.28
         with:
-          use_global_config:       'true'
-          global_config_path:      hub-config/sync-files/config/marketplace-kit-global-config.json
-          config_path:             .github/bos-universal-config.json
-          action_yml_path:        ${{ inputs.action_yml_path }}
-          fail_on_warning:        ${{ inputs.fail_on_warning && 'true' || '' }}
-          skip_checks:            ${{ inputs.skip_checks }}
-          github_token:           ${{ github.token }}
-          check_org_health:       ${{ inputs.check_org_health }}
-          org_health_repo:        ${{ inputs.org_health_repo }}
-          require_security:        ${{ inputs.require_security }}
+          use_global_config: "true"
+          global_config_path: hub-config/sync-files/config/marketplace-kit-global-config.json
+          config_path: .github/bos-universal-config.json
+          action_yml_path: ${{ inputs.action_yml_path }}
+          fail_on_warning: ${{ inputs.fail_on_warning && 'true' || '' }}
+          skip_checks: ${{ inputs.skip_checks }}
+          github_token: ${{ github.token }}
+          check_org_health: ${{ inputs.check_org_health }}
+          org_health_repo: ${{ inputs.org_health_repo }}
+          require_security: ${{ inputs.require_security }}
           require_code_of_conduct: ${{ inputs.require_code_of_conduct }}
-          require_contributing:    ${{ inputs.require_contributing }}
-          require_support:         ${{ inputs.require_support }}
+          require_contributing: ${{ inputs.require_contributing }}
+          require_support: ${{ inputs.require_support }}
           require_issue_templates: ${{ inputs.require_issue_templates }}
-          require_pr_template:     ${{ inputs.require_pr_template }}
-          require_funding:         ${{ inputs.require_funding }}
+          require_pr_template: ${{ inputs.require_pr_template }}
+          require_funding: ${{ inputs.require_funding }}
           community_health_source: ${{ inputs.community_health_source }}
-          security_source:         ${{ inputs.security_source }}
-          code_of_conduct_source:  ${{ inputs.code_of_conduct_source }}
-          contributing_source:     ${{ inputs.contributing_source }}
-          support_source:          ${{ inputs.support_source }}
-          issue_templates_source:  ${{ inputs.issue_templates_source }}
-          pr_template_source:      ${{ inputs.pr_template_source }}
-          funding_source:          ${{ inputs.funding_source }}
-          require_dependabot:           ${{ inputs.require_dependabot }}
-          require_codeql:               ${{ inputs.require_codeql }}
-          require_editorconfig:         ${{ inputs.require_editorconfig }}
-          require_gitattributes:        ${{ inputs.require_gitattributes }}
-          require_gitignore:            ${{ inputs.require_gitignore }}
-          require_markdownlint:         ${{ inputs.require_markdownlint }}
-          require_yamllint:             ${{ inputs.require_yamllint }}
-          require_ghas_code_scanning:   ${{ inputs.require_ghas_code_scanning }}
+          security_source: ${{ inputs.security_source }}
+          code_of_conduct_source: ${{ inputs.code_of_conduct_source }}
+          contributing_source: ${{ inputs.contributing_source }}
+          support_source: ${{ inputs.support_source }}
+          issue_templates_source: ${{ inputs.issue_templates_source }}
+          pr_template_source: ${{ inputs.pr_template_source }}
+          funding_source: ${{ inputs.funding_source }}
+          require_dependabot: ${{ inputs.require_dependabot }}
+          require_codeql: ${{ inputs.require_codeql }}
+          require_editorconfig: ${{ inputs.require_editorconfig }}
+          require_gitattributes: ${{ inputs.require_gitattributes }}
+          require_gitignore: ${{ inputs.require_gitignore }}
+          require_markdownlint: ${{ inputs.require_markdownlint }}
+          require_yamllint: ${{ inputs.require_yamllint }}
+          require_ghas_code_scanning: ${{ inputs.require_ghas_code_scanning }}
           require_ghas_secret_scanning: ${{ inputs.require_ghas_secret_scanning }}
-          require_dependabot_alerts:    ${{ inputs.require_dependabot_alerts }}
-          require_security_devops:      ${{ inputs.require_security_devops }}
-          require_scorecard:            ${{ inputs.require_scorecard }}
+          require_dependabot_alerts: ${{ inputs.require_dependabot_alerts }}
+          require_security_devops: ${{ inputs.require_security_devops }}
+          require_scorecard: ${{ inputs.require_scorecard }}
 
   # ---------------------------------------------------------------------------
   # `name-check` — opt-in Marketplace name availability check.
@@ -418,12 +426,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.checkout_ref || github.sha }}
           persist-credentials: false
 
       - name: Resolve proposed name
         id: resolve
         env:
-          PROPOSED:        ${{ inputs.proposed_name }}
+          PROPOSED: ${{ inputs.proposed_name }}
           ACTION_YML_PATH: ${{ inputs.action_yml_path }}
         run: |
           set -euo pipefail
@@ -455,9 +464,9 @@ jobs:
 
       - name: Marketplace name check
         id: name
-        uses: blackoutsecure/bos-marketplace-kit/.github/actions/name-check@5424e908ce6778cd8eb0d97da5264ddc34fc5f0d # v0.1.24
+        uses: blackoutsecure/bos-marketplace-kit/.github/actions/name-check@c3ca87e5c5c9d72237ce8ff426a759b0f878de91 # v0.1.28
         with:
-          proposed_name:     ${{ steps.resolve.outputs.name }}
+          proposed_name: ${{ steps.resolve.outputs.name }}
           fail_on_collision: ${{ inputs.name_check_fail_on_collision }}
 
   # ---------------------------------------------------------------------------
@@ -475,30 +484,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.checkout_ref || github.sha }}
           persist-credentials: false
 
       - name: Render branding preview
         id: render
-        uses: blackoutsecure/bos-marketplace-kit/.github/actions/branding-preview@5424e908ce6778cd8eb0d97da5264ddc34fc5f0d # v0.1.24
+        uses: blackoutsecure/bos-marketplace-kit/.github/actions/branding-preview@c3ca87e5c5c9d72237ce8ff426a759b0f878de91 # v0.1.28
         with:
           action_yml_path: ${{ inputs.action_yml_path }}
-          feather_ref:     ${{ inputs.branding_preview_feather_ref }}
+          feather_ref: ${{ inputs.branding_preview_feather_ref }}
 
       - name: Upload card SVG
         id: upload
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name:            ${{ inputs.branding_preview_artifact_name }}
-          path:            ${{ steps.render.outputs.card_path }}
+          name: ${{ inputs.branding_preview_artifact_name }}
+          path: ${{ steps.render.outputs.card_path }}
           if-no-files-found: error
-          retention-days:  ${{ inputs.branding_preview_artifact_retention_days }}
+          retention-days: ${{ inputs.branding_preview_artifact_retention_days }}
 
       - name: Job summary
         if: always()
         env:
-          CARD_PATH:     ${{ steps.render.outputs.card_path }}
-          ICON:          ${{ steps.render.outputs.icon }}
-          COLOR:         ${{ steps.render.outputs.color }}
+          CARD_PATH: ${{ steps.render.outputs.card_path }}
+          ICON: ${{ steps.render.outputs.icon }}
+          COLOR: ${{ steps.render.outputs.color }}
           ARTIFACT_NAME: ${{ inputs.branding_preview_artifact_name }}
         run: |
           {

@@ -38,5 +38,5 @@ runs:
           merge_group) ref="${MERGE_GROUP_BASE_REF#refs/heads/}" ;;
           *) ref="${REF_NAME}" ;;
         esac
-        [[ "${ref}" == "dev" ]] || ref="main"
+        [[ "${ref}" == "main" ]] || ref="dev"
         echo "ref=${ref}" >> "${GITHUB_OUTPUT}"

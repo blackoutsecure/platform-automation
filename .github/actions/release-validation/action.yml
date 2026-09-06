@@ -1,0 +1,38 @@
+name: Release validation
+author: Blackout Secure
+description: Run standardized, extensible release-readiness checks and emit structured findings.
+inputs:
+  config:
+    description: Normalized release_validation JSON object.
+    required: true
+  expected_tag:
+    description: Optional SemVer tag expected for this release.
+    required: false
+    default: ''
+  release_kind:
+    description: artifact, marketplace, or hub.
+    required: false
+    default: artifact
+outputs:
+  findings:
+    description: Structured findings for the shared job-report action.
+    value: ${{ steps.validate.outputs.findings }}
+  commands:
+    description: JSON list of validation commands that ran.
+    value: ${{ steps.validate.outputs.commands }}
+  passed:
+    description: true when no failing finding was emitted.
+    value: ${{ steps.validate.outputs.passed }}
+runs:
+  using: composite
+  steps:
+    - id: validate
+      name: Validate release candidate
+      shell: bash
+      env:
+        RELEASE_VALIDATION_CONFIG: ${{ inputs.config }}
+        RELEASE_VALIDATION_EXPECTED_TAG: ${{ inputs.expected_tag }}
+        RELEASE_VALIDATION_KIND: ${{ inputs.release_kind }}
+      run: |
+        set -euo pipefail
+        python3 "${GITHUB_ACTION_PATH}/validate.py"

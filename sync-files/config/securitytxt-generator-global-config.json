@@ -1,0 +1,34 @@
+{
+  "security_txt": {
+    "audit": {
+      "enable": true,
+      "fail_on": "never",
+      "expires_max_days": 365,
+      "rules": {
+        "require_contact": "fail",
+        "require_expires": "fail",
+        "expires_not_expired": "fail",
+        "expires_within_max_days": "fail",
+        "valid_contact_uri": "fail",
+        "require_https_uris": "fail",
+        "well_known_location": "fail",
+        "single_valued_fields": "fail",
+        "require_utf8_no_bom": "fail",
+        "require_canonical": "warn",
+        "canonical_matches_site_url": "warn",
+        "forbid_unknown_fields": "warn",
+        "recommend_policy": "warn",
+        "recommend_encryption": "warn"
+      }
+    },
+    "reporting": {
+      "step_summary": true,
+      "sarif": true,
+      "json_report": true,
+      "recommendations": true
+    },
+    "remediation": {
+      "enable_ai_findings_summary": false
+    }
+  }
+}

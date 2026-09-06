@@ -1,0 +1,34 @@
+{
+  "robots_txt": {
+    "audit": {
+      "enable": true,
+      "fail_on": "never",
+      "max_size_kb": 500,
+      "rules": {
+        "require_user_agent": "fail",
+        "require_sitemap": "fail",
+        "sitemap_absolute_url": "fail",
+        "sitemap_https": "fail",
+        "forbid_disallow_all": "fail",
+        "valid_directives": "fail",
+        "valid_path_prefixes": "fail",
+        "require_utf8_no_bom": "fail",
+        "forbid_html_content": "fail",
+        "site_root_location": "fail",
+        "sitemap_same_origin": "warn",
+        "no_duplicate_groups": "warn",
+        "file_size_limit": "warn",
+        "sitemap_file_exists": "warn"
+      }
+    },
+    "reporting": {
+      "step_summary": true,
+      "sarif": true,
+      "json_report": true,
+      "recommendations": true
+    },
+    "remediation": {
+      "enable_ai_findings_summary": false
+    }
+  }
+}

@@ -102,7 +102,7 @@
 # block in the caller's own `.github/bos-universal-config.json`, which the
 # kit discovers automatically as its repository-tier config.
 
-name: '[RUNTIME] Blackout Secure Universal Security'
+name: "[RUNTIME] Blackout Secure Universal Security"
 
 on:
   workflow_call:
@@ -118,7 +118,7 @@ on:
       node_version:
         type: string
         required: false
-        default: '20'
+        default: "20"
       enable_python_lint:
         type: boolean
         required: false
@@ -126,7 +126,7 @@ on:
       python_version:
         type: string
         required: false
-        default: '3.11'
+        default: "3.11"
       enable_shell_lint:
         type: boolean
         required: false
@@ -187,7 +187,7 @@ on:
           egress. Bare integer string; no unit.
         type: string
         required: false
-        default: '20'
+        default: "20"
       config_authoritative:
         description: Use .github/bos-universal-config.json instead of direct gate inputs.
         type: boolean
@@ -205,6 +205,9 @@ on:
           posture audit (PS002 secret scanning, PS003 Dependabot alerts,
           PS020-PS025 branch protection). Falls back to GITHUB_TOKEN when
           absent — sufficient for PS001 only.
+        required: false
+      GATEWALL_APP_PRIVATE_KEY:
+        description: Private key for the reusable Gatewall automation GitHub App.
         required: false
 
 permissions: {}
@@ -225,6 +228,22 @@ jobs:
       org: ${{ steps.config.outputs.organization }}
       config: ${{ steps.config.outputs.cfg }}
     steps:
+      - name: Mint security audit token
+        id: security-app
+        if: vars.GATEWALL_APP_ID != ''
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.GATEWALL_APP_ID }}
+          private-key: ${{ secrets.GATEWALL_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-actions: read
+          permission-administration: read
+          permission-contents: read
+          permission-secret-scanning-alerts: read
+          permission-security-events: write
+          permission-vulnerability-alerts: read
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -240,7 +259,7 @@ jobs:
         id: config
         uses: ./hub-runtime/.github/actions/universal-config
         with:
-          allow_missing: 'false'
+          allow_missing: "false"
       - name: Resolve security settings
         id: resolve
         env:
@@ -277,7 +296,7 @@ jobs:
               "node_version": "20",
               "python_lint_mode": "auto",
               "python_version": "3.11",
-              "python_packages": ["ruff>=0.6", "pytest>=8.0"],
+              "python_packages": ["ruff>=0.6", "pytest>=8.0", "PyYAML>=6.0"],
               "shell_lint_mode": "auto",
               "enable_dependency_review": True,
               "enable_code_scan": True,
@@ -320,59 +339,56 @@ jobs:
                   "code_scan_http_timeout": os.environ["INPUT_CODE_SCAN_HTTP_TIMEOUT"] or "20",
               })
 
-                  ignored = {".git", "node_modules", "vendor", "dist", "build", "target", "out", ".venv", "venv", "env", ".tox", "__pycache__"}
-                  node_extensions = {".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"}
-                  python_markers = {"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", "poetry.lock"}
-                  node_markers = {"package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml"}
-                  code_signals = {"node": set(), "python": set(), "shell": set()}
-                  for directory, dirnames, filenames in os.walk(os.environ.get("GITHUB_WORKSPACE", ".")):
-                    dirnames[:] = [name for name in dirnames if name not in ignored]
-                    for filename in filenames:
-                      suffix = Path(filename).suffix.lower()
-                      if suffix in node_extensions or filename in node_markers:
-                        code_signals["node"].add(filename if filename in node_markers else suffix)
-                      if suffix == ".py" or filename in python_markers or (filename.startswith("requirements-") and suffix == ".txt"):
-                        code_signals["python"].add(filename if filename in python_markers else suffix)
-                      if suffix in {".sh", ".bash", ".bats"}:
-                        code_signals["shell"].add(suffix)
+          ignored = {".git", "node_modules", "vendor", "dist", "build", "target", "out", ".venv", "venv", "env", ".tox", "__pycache__"}
+          node_extensions = {".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"}
+          python_markers = {"pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile", "poetry.lock"}
+          node_markers = {"package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml"}
+          code_signals = {"node": set(), "python": set(), "shell": set()}
+          for directory, dirnames, filenames in os.walk(os.environ.get("GITHUB_WORKSPACE", ".")):
+            dirnames[:] = [name for name in dirnames if name not in ignored]
+            for filename in filenames:
+              suffix = Path(filename).suffix.lower()
+              if suffix in node_extensions or filename in node_markers:
+                code_signals["node"].add(filename if filename in node_markers else suffix)
+              if suffix == ".py" or filename in python_markers or (filename.startswith("requirements-") and suffix == ".txt"):
+                code_signals["python"].add(filename if filename in python_markers else suffix)
+              if suffix in {".sh", ".bash", ".bats"}:
+                code_signals["shell"].add(suffix)
 
-                  def configured_mode(name):
-                    mode_key = f"{name}_lint_mode"
-                    legacy_key = f"enable_{name}_lint"
-                    if mode_key in configured:
-                      value = configured[mode_key]
-                    elif legacy_key in configured:
-                      value = configured[legacy_key]
-                    elif not use_config:
-                      value = os.environ.get(f"INPUT_ENABLE_{name.upper()}_LINT", "")
-                      value = value if value else "auto"
-                    else:
-                      value = gate[mode_key]
-                    if isinstance(value, bool):
-                      return "true" if value else "false"
-                    if value not in {"auto", "true", "false"}:
-                      raise SystemExit(f"gate.{mode_key} must be auto, true, or false")
-                    return value
+          def configured_mode(name):
+            mode_key = f"{name}_lint_mode"
+            if mode_key in configured:
+              value = configured[mode_key]
+            elif not use_config:
+              value = os.environ.get(f"INPUT_ENABLE_{name.upper()}_LINT", "")
+              value = value if value else "auto"
+            else:
+              value = gate[mode_key]
+            if isinstance(value, bool):
+              return "true" if value else "false"
+            if value not in {"auto", "true", "false"}:
+              raise SystemExit(f"gate.{mode_key} must be auto, true, or false")
+            return value
 
-                  quality = {}
-                  for name in ("node", "python", "shell"):
-                    mode = configured_mode(name)
-                    signals = sorted(code_signals[name])
-                    if mode == "true":
-                      status = "applicable"
-                      reason = "Explicitly enabled by policy."
-                    elif mode == "false":
-                      status = "disabled"
-                      reason = "Explicitly disabled by policy."
-                    elif signals:
-                      status = "applicable"
-                      reason = f"{name.title()} signals detected: {', '.join(signals)}."
-                    else:
-                      status = "not_applicable"
-                      reason = f"No {name.title()} source or package metadata detected."
-                    quality[name] = {"mode": mode, "status": status, "signals": signals, "reason": reason}
-                    gate[f"enable_{name}_lint"] = status == "applicable"
-                  gate["quality_applicability"] = quality
+          quality = {}
+          for name in ("node", "python", "shell"):
+            mode = configured_mode(name)
+            signals = sorted(code_signals[name])
+            if mode == "true":
+              status = "applicable"
+              reason = "Explicitly enabled by policy."
+            elif mode == "false":
+              status = "disabled"
+              reason = "Explicitly disabled by policy."
+            elif signals:
+              status = "applicable"
+              reason = f"{name.title()} signals detected: {', '.join(signals)}."
+            else:
+              status = "not_applicable"
+              reason = f"No {name.title()} source or package metadata detected."
+            quality[name] = {"mode": mode, "status": status, "signals": signals, "reason": reason}
+            gate[f"enable_{name}_lint"] = status == "applicable"
+          gate["quality_applicability"] = quality
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               output.write("gate<<__BOS_GATE__\n")
               output.write(json.dumps(gate, separators=(",", ":")) + "\n")
@@ -396,7 +412,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Run kit lint composite
-        uses: blackoutsecure/bos-marketplace-kit/.github/actions/lint@5424e908ce6778cd8eb0d97da5264ddc34fc5f0d # v0.1.24
+        uses: blackoutsecure/bos-marketplace-kit/.github/actions/lint@c3ca87e5c5c9d72237ce8ff426a759b0f878de91 # v0.1.28
         with:
           severity: fail
 
@@ -576,30 +592,30 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             sync-files/config/code-scanning-kit-global-config.json
-            .github/actions/shared/ai-remediation-pr
+            .github/actions/ai-remediation-pr
           sparse-checkout-cone-mode: false
       - name: Run bos-code-scanning-kit
         id: code_scan
-        uses: blackoutsecure/bos-code-scanning-kit@b69500c85971a6df06e33f7b56881682bd09c2a2 # dev
+        uses: blackoutsecure/bos-code-scanning-kit@1674e4e0de38ba66ce8a201db70cfd57ff47e225 # v1.0.43
         with:
-          github_token: ${{ secrets.SCANNING_PAT || secrets.GITHUB_TOKEN }}
+          github_token: ${{ steps.security-app.outputs.token || secrets.SCANNING_PAT || secrets.GITHUB_TOKEN }}
           fail_on: ${{ fromJSON(needs.resolve-config.outputs.gate).code_scan_fail_on }}
           http_timeout: ${{ fromJSON(needs.resolve-config.outputs.gate).code_scan_http_timeout }}
-          enable_posture: 'true'
-          enable_scanners: 'true'
-          enable_upload: 'true'
+          enable_posture: "true"
+          enable_scanners: "true"
+          enable_upload: "true"
           # Distinct from `security-scan.yml`'s own kit call (category
           # `bos-code-scanning-kit-launchpad`) so a push that fires both this
           # PR/push gate AND Launchpad's release-time scan for the same commit
           # doesn't race two uploads onto the same Code Scanning category.
           category: bos-code-scanning-kit-gate
-          use_global_config: 'true'
+          use_global_config: "true"
           global_config_path: hub-config/sync-files/config/code-scanning-kit-global-config.json
           config: .github/bos-universal-config.json
       - name: Reconcile code-scanning recommendations
         id: remediation
         if: always() && steps.code_scan.outputs.recommendations_path != ''
-        uses: ./hub-config/.github/actions/shared/ai-remediation-pr
+        uses: ./hub-config/.github/actions/ai-remediation-pr
         with:
           recommendations: ${{ steps.code_scan.outputs.recommendations_path }}
           mode: notify
@@ -647,7 +663,7 @@ jobs:
           # Need full history so the composite can diff against base.
           fetch-depth: 0
       - name: Check `uses:` pinning
-        uses: blackoutsecure/bos-automation-hub/.github/actions/check-pinned-actions@main  # TODO: pin to SHA after first tag
+        uses: blackoutsecure/bos-automation-hub/.github/actions/check-pinned-actions@dev
 
   # -----------------------------------------------------------------
   # 6a. README header — verify the README starts with the canonical
@@ -667,7 +683,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Validate README header
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/check-readme-header@main  # TODO: pin to SHA after next hub release
+        uses: blackoutsecure/bos-automation-hub/.github/actions/check-readme-header@dev
         with:
           profile: ${{ fromJSON(needs.resolve-config.outputs.gate).readme_header_profile }}
 
@@ -740,7 +756,7 @@ jobs:
           repository: blackoutsecure/bos-automation-hub
           ref: ${{ inputs.hub_ref != 'auto' && inputs.hub_ref || (github.event_name == 'pull_request' && github.base_ref || github.event_name == 'merge_group' && github.event.merge_group.base_ref || github.ref_name == 'dev' && 'dev' || 'main') }}
           path: hub-runtime
-          sparse-checkout: .github/actions/shared/job-report
+          sparse-checkout: .github/actions/job-report
           sparse-checkout-cone-mode: false
       - name: Build gate findings
         id: findings
@@ -795,8 +811,8 @@ jobs:
                "Restore the canonical Blackout Secure README header for this repo profile."),
               ("SG031", "R_PRTITLE", "Conventional PR title", "compliance",
                "Retitle the PR as `<type>: <subject>` using an allowed conventional-commit type."),
-          ]
-              QUALITY_GATES = {"SG011": "node", "SG012": "python", "SG013": "shell"}
+            ]
+          QUALITY_GATES = {"SG011": "node", "SG012": "python", "SG013": "shell"}
 
           org = json.loads(os.environ["ORG"] or "{}")
           gate = json.loads(os.environ["GATE"] or "{}")
@@ -821,13 +837,13 @@ jobs:
                 advice = quality.get("reason", "No applicability details were reported.")
               elif severity == "fail":
                 evidence = f"job result: {result}"
-                  advice = remediation
+                advice = remediation
               elif severity == "skip":
                 evidence = f"job result: {result}"
-                  advice = "Enable this gate in `.github/bos-universal-config.json` to obtain a verdict."
+                advice = "Enable this gate in `.github/bos-universal-config.json` to obtain a verdict."
               else:
                 evidence = f"job result: {result}"
-                  advice = "—"
+                advice = "—"
               findings.append({
                   "id": rule_id,
                   "severity": severity,
@@ -893,7 +909,7 @@ jobs:
                   handle.write(f"{name}<<__BOS_EOF__\n{value}\n__BOS_EOF__\n")
           PY
       - name: Publish security gate report
-        uses: ./hub-runtime/.github/actions/shared/job-report
+        uses: ./hub-runtime/.github/actions/job-report
         with:
           title: ${{ steps.findings.outputs.title_prefix }} Security Gate Report
           subject: >-

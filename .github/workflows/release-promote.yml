@@ -5,8 +5,10 @@
 # (Marketplace publishing prerequisite, see
 # https://docs.github.com/en/actions/how-tos/create-and-publish-actions/publish-in-github-marketplace).
 #
-# Pipeline (two stages):
-#   1. promote   — `bos-marketplace-kit/.github/actions/promote@v0.1.14`
+# Pipeline (three stages):
+#   1. validate  — reruns standard ecosystem checks, verifies generated
+#                  artifacts, and applies Marketplace-specific policy.
+#   2. promote   — `bos-marketplace-kit/.github/actions/promote@v0.1.14`
 #                  copies an allowlisted set of paths from
 #                  `source_branch` to `target_branch`, tags
 #                  `target_branch`. v0.1.3+ also tags the existing
@@ -15,7 +17,7 @@
 #                  release dispatched after CI-only or workflow-only
 #                  changes still produces a tag and a GitHub Release
 #                  instead of silently no-op'ing).
-#   2. release   — calls `github-release.yml@main` against the new tag
+#   3. release   — calls `github-release.yml@main` against the new tag
 #                  to render notes and create the GitHub Release.
 #
 # Implementation: the promote primitive lives in the published
@@ -50,7 +52,7 @@ name: Marketplace Promotion Release
           `source_branch` if it does not exist on origin.
         required: false
         type: string
-        default: 'main'
+        default: "main"
       allowlist_paths:
         description: >-
           Newline-separated repo-relative paths to copy from
@@ -112,7 +114,7 @@ name: Marketplace Promotion Release
           directory is silently stripped post-checkout.
         required: false
         type: string
-        default: ''
+        default: ""
       tag_name:
         description: >-
           Tag to create on the new `target_branch` commit.
@@ -131,14 +133,14 @@ name: Marketplace Promotion Release
           case is handled before the composite runs.
         required: false
         type: string
-        default: ''
+        default: ""
       commit_message:
         description: >-
           Commit message for the promotion commit. Default
           `release: <tag_name>`.
         required: false
         type: string
-        default: ''
+        default: ""
       dry_run:
         description: >-
           When `true`, validates inputs and stages the diff but does
@@ -164,7 +166,7 @@ name: Marketplace Promotion Release
         type: boolean
         default: false
       source_release_max_age_hours:
-        description: 'Maximum age of the required source-branch release. Default 168 hours (7 days).'
+        description: "Maximum age of the required source-branch release. Default 168 hours (7 days)."
         required: false
         type: number
         default: 168
@@ -187,10 +189,10 @@ name: Marketplace Promotion Release
 
       # ----- GitHub Release publishing (forwarded to github-release.yml) ----
       release_name:
-        description: 'Release title. Defaults to `tag_name`.'
+        description: "Release title. Defaults to `tag_name`."
         required: false
         type: string
-        default: ''
+        default: ""
       release_template_path:
         description: >-
           Path to a Markdown release-notes template (resolved on the
@@ -198,14 +200,14 @@ name: Marketplace Promotion Release
           the bundled default in `render-release-notes`.
         required: false
         type: string
-        default: ''
+        default: ""
       release_extra_context:
-        description: 'Newline-separated `KEY=VALUE` pairs interpolated into the release notes template.'
+        description: "Newline-separated `KEY=VALUE` pairs interpolated into the release notes template."
         required: false
         type: string
-        default: ''
+        default: ""
       release_draft:
-        description: 'Create the release as a draft.'
+        description: "Create the release as a draft."
         required: false
         type: boolean
         default: false
@@ -213,22 +215,22 @@ name: Marketplace Promotion Release
         description: "`true`/`false` to force pre-release. Empty lets the renderer auto-detect from `vX.Y.Z-<suffix>`."
         required: false
         type: string
-        default: ''
+        default: ""
       release_make_latest:
-        description: '`true`/`false`/`legacy`. Forwarded to softprops/action-gh-release.'
+        description: "`true`/`false`/`legacy`. Forwarded to softprops/action-gh-release."
         required: false
         type: string
-        default: 'true'
+        default: "true"
       release_generate_notes:
         description: "Append GitHub's auto-generated PR/contributor notes after the rendered body."
         required: false
         type: boolean
         default: true
       release_files:
-        description: 'Newline-separated globs of artifacts to attach to the release.'
+        description: "Newline-separated globs of artifacts to attach to the release."
         required: false
         type: string
-        default: ''
+        default: ""
       release_ai_changelog:
         description: >-
           `'true'` to summarize the commit log (between `previous_tag`
@@ -239,7 +241,7 @@ name: Marketplace Promotion Release
           auto-resolved by the `Resolve tag` step.
         required: false
         type: string
-        default: 'false'
+        default: "false"
       release_ai_model:
         description: >-
           GitHub Models model identifier (e.g. `openai/gpt-4o-mini`).
@@ -250,16 +252,16 @@ name: Marketplace Promotion Release
 
     outputs:
       target_sha:
-        description: 'SHA on `target_branch` after the promotion commit (empty when no-op or dry-run).'
+        description: "SHA on `target_branch` after the promotion commit (empty when no-op or dry-run)."
         value: ${{ jobs.promote.outputs.target_sha }}
       source_sha:
-        description: 'SHA on `source_branch` that was promoted.'
+        description: "SHA on `source_branch` that was promoted."
         value: ${{ jobs.promote.outputs.source_sha }}
       tag_name:
-        description: 'Resolved tag name (echoed for caller convenience).'
+        description: "Resolved tag name (echoed for caller convenience)."
         value: ${{ jobs.promote.outputs.tag_name }}
       promoted:
-        description: '`true` when a new commit + tag were created and pushed.'
+        description: "`true` when a new commit + tag were created and pushed."
         value: ${{ jobs.promote.outputs.promoted }}
       removed_paths:
         description: >-
@@ -283,7 +285,7 @@ name: Marketplace Promotion Release
           for changelog generation.
         value: ${{ jobs.promote.outputs.previous_tag }}
       release_url:
-        description: 'GitHub Release HTML URL (when the release stage ran).'
+        description: "GitHub Release HTML URL (when the release stage ran)."
         value: ${{ jobs.release.outputs.release_url }}
 
 permissions:
@@ -366,12 +368,40 @@ jobs:
               ;;
           esac
 
+  release-validation:
+    name: Standard release validation
+    needs: preflight-runner-config
+    permissions:
+      contents: read
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-release-validation.yml@main
+    with:
+      checkout_ref: ${{ inputs.source_branch }}
+      expected_tag: ${{ inputs.tag_name }}
+      release_kind: marketplace
+
+  marketplace-validation:
+    name: Marketplace policy validation
+    needs: preflight-runner-config
+    permissions:
+      contents: read
+    uses: blackoutsecure/bos-automation-hub/.github/workflows/bos-universal-marketplace.yml@main
+    with:
+      checkout_ref: ${{ inputs.source_branch }}
+      action_yml_path: action.yml
+      run_branding_preview: false
+
   # ---------------------------------------------------------------------------
   # Stage 1 — promote source_branch -> target_branch (allowlist) + tag.
   # ---------------------------------------------------------------------------
   promote:
     name: Promote and tag
-    needs: [preflight-runner-config, source-release-gate]
+    needs:
+      [
+        preflight-runner-config,
+        source-release-gate,
+        release-validation,
+        marketplace-validation,
+      ]
     # Resolves `vars.DEFAULT_RUNNER` (bare label or JSON-array string).
     # Shape is enforced by `preflight-runner-config`, so no fallback —
     # see README ("Runner resolution") for the full rationale.
@@ -386,13 +416,13 @@ jobs:
       # via a secret-forwarded checkout.
       contents: write
     outputs:
-      target_sha:         ${{ steps.promote.outputs.target_sha }}
-      source_sha:         ${{ steps.promote.outputs.source_sha }}
-      tag_name:           ${{ steps.promote.outputs.tag_name }}
-      promoted:           ${{ steps.promote.outputs.promoted }}
-      removed_paths:      ${{ steps.promote.outputs.removed_paths }}
+      target_sha: ${{ steps.promote.outputs.target_sha }}
+      source_sha: ${{ steps.promote.outputs.source_sha }}
+      tag_name: ${{ steps.promote.outputs.tag_name }}
+      promoted: ${{ steps.promote.outputs.promoted }}
+      removed_paths: ${{ steps.promote.outputs.removed_paths }}
       removed_violations: ${{ steps.promote.outputs.removed_violations }}
-      previous_tag:       ${{ steps.resolve_tag.outputs.previous_tag }}
+      previous_tag: ${{ steps.resolve_tag.outputs.previous_tag }}
     steps:
       - name: Checkout source_branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -405,7 +435,7 @@ jobs:
 
       - name: Resolve tag
         id: resolve_tag
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/resolve-release-tag@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/resolve-release-tag@main
         with:
           tag_name: ${{ inputs.tag_name }}
           bump: patch
@@ -415,8 +445,8 @@ jobs:
         id: extras
         env:
           INCLUDE_DEPENDABOT: ${{ inputs.include_dependabot_config }}
-          INCLUDE_METADATA:   ${{ inputs.include_github_metadata }}
-          EXTRA_SYNC_PATHS:   ${{ inputs.extra_sync_paths }}
+          INCLUDE_METADATA: ${{ inputs.include_github_metadata }}
+          EXTRA_SYNC_PATHS: ${{ inputs.extra_sync_paths }}
         shell: bash
         run: |
           set -euo pipefail
@@ -488,30 +518,30 @@ jobs:
         # step above (operator-supplied verbatim OR auto-bumped
         # next-patch) — never `inputs.tag_name` directly, because
         # that can be empty.
-        uses: blackoutsecure/bos-marketplace-kit/.github/actions/promote@5424e908ce6778cd8eb0d97da5264ddc34fc5f0d # v0.1.24
+        uses: blackoutsecure/bos-marketplace-kit/.github/actions/promote@c3ca87e5c5c9d72237ce8ff426a759b0f878de91 # v0.1.28
         with:
-          source_branch:         ${{ inputs.source_branch }}
-          target_branch:         ${{ inputs.target_branch }}
-          allowlist_paths:       ${{ inputs.allowlist_paths }}
+          source_branch: ${{ inputs.source_branch }}
+          target_branch: ${{ inputs.target_branch }}
+          allowlist_paths: ${{ inputs.allowlist_paths }}
           extra_allowlist_paths: ${{ steps.extras.outputs.extra_allowlist_paths }}
-          tag_name:              ${{ steps.resolve_tag.outputs.tag_name }}
-          commit_message:        ${{ inputs.commit_message }}
-          dry_run:               ${{ inputs.dry_run }}
-          update_major_tag:      ${{ inputs.update_major_tag }}
+          tag_name: ${{ steps.resolve_tag.outputs.tag_name }}
+          commit_message: ${{ inputs.commit_message }}
+          dry_run: ${{ inputs.dry_run }}
+          update_major_tag: ${{ inputs.update_major_tag }}
 
       - name: Job summary
         if: always()
         env:
-          PROMOTED:           ${{ steps.promote.outputs.promoted }}
-          SOURCE_BRANCH:      ${{ inputs.source_branch }}
-          TARGET_BRANCH:      ${{ inputs.target_branch }}
-          SOURCE_SHA:         ${{ steps.promote.outputs.source_sha }}
-          TARGET_SHA:         ${{ steps.promote.outputs.target_sha }}
-          TAG_NAME:           ${{ steps.resolve_tag.outputs.tag_name }}
-          AUTO_RESOLVED:      ${{ steps.resolve_tag.outputs.auto_resolved }}
-          PREVIOUS_TAG:       ${{ steps.resolve_tag.outputs.previous_tag }}
-          DRY_RUN:            ${{ inputs.dry_run }}
-          REMOVED_PATHS:      ${{ steps.promote.outputs.removed_paths }}
+          PROMOTED: ${{ steps.promote.outputs.promoted }}
+          SOURCE_BRANCH: ${{ inputs.source_branch }}
+          TARGET_BRANCH: ${{ inputs.target_branch }}
+          SOURCE_SHA: ${{ steps.promote.outputs.source_sha }}
+          TARGET_SHA: ${{ steps.promote.outputs.target_sha }}
+          TAG_NAME: ${{ steps.resolve_tag.outputs.tag_name }}
+          AUTO_RESOLVED: ${{ steps.resolve_tag.outputs.auto_resolved }}
+          PREVIOUS_TAG: ${{ steps.resolve_tag.outputs.previous_tag }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          REMOVED_PATHS: ${{ steps.promote.outputs.removed_paths }}
           REMOVED_VIOLATIONS: ${{ steps.promote.outputs.removed_violations }}
         run: |
           # Render the tag cell with a hint when we picked it for the
@@ -600,23 +630,23 @@ jobs:
       models: read
     uses: blackoutsecure/bos-automation-hub/.github/workflows/github-release.yml@main
     with:
-      tag_name:               ${{ needs.promote.outputs.tag_name }}
-      release_name:           ${{ inputs.release_name }}
-      template_path:          ${{ inputs.release_template_path }}
-      extra_context:          ${{ inputs.release_extra_context }}
-      draft:                  ${{ inputs.release_draft }}
-      prerelease:             ${{ inputs.release_prerelease }}
-      make_latest:            ${{ inputs.release_make_latest }}
+      tag_name: ${{ needs.promote.outputs.tag_name }}
+      release_name: ${{ inputs.release_name }}
+      template_path: ${{ inputs.release_template_path }}
+      extra_context: ${{ inputs.release_extra_context }}
+      draft: ${{ inputs.release_draft }}
+      prerelease: ${{ inputs.release_prerelease }}
+      make_latest: ${{ inputs.release_make_latest }}
       generate_release_notes: ${{ inputs.release_generate_notes }}
-      target_commitish:       ${{ needs.promote.outputs.target_sha }}
-      files:                  ${{ inputs.release_files }}
+      target_commitish: ${{ needs.promote.outputs.target_sha }}
+      files: ${{ inputs.release_files }}
       # AI changelog wiring. `previous_tag` is the auto-resolved value
       # from the promote job's `Resolve tag` step — empty on the first
       # release of a kit (renderer treats that as "skip changelog
       # section"). `source_branch` is the workflow input (typically
       # `dev`); the renderer summarizes commits between previous_tag
       # and the HEAD of this branch via the GitHub Compare API.
-      previous_tag:           ${{ needs.promote.outputs.previous_tag }}
-      source_branch:          ${{ inputs.source_branch }}
-      ai_changelog:           ${{ inputs.release_ai_changelog }}
-      ai_model:               ${{ inputs.release_ai_model }}
+      previous_tag: ${{ needs.promote.outputs.previous_tag }}
+      source_branch: ${{ inputs.source_branch }}
+      ai_changelog: ${{ inputs.release_ai_changelog }}
+      ai_model: ${{ inputs.release_ai_model }}

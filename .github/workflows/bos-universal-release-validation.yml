@@ -1,0 +1,91 @@
+# Standard release-readiness gate. This complements PR security and
+# Marketplace policy checks by rerunning the candidate's own tests/build at
+# the exact ref being published and rejecting uncommitted generated output.
+name: '[RUNTIME] Blackout Secure Universal Release Validation'
+
+"on":
+  workflow_call:
+    inputs:
+      checkout_ref:
+        description: Branch, tag, or SHA to validate.
+        required: false
+        type: string
+        default: ''
+      expected_tag:
+        description: Optional SemVer tag expected for this release.
+        required: false
+        type: string
+        default: ''
+      release_kind:
+        description: artifact, marketplace, or hub.
+        required: false
+        type: string
+        default: artifact
+    outputs:
+      outcome:
+        description: success, warn, or failure.
+        value: ${{ jobs.validate.outputs.outcome }}
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Release readiness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      outcome: ${{ steps.report.outputs.outcome }}
+    steps:
+      - name: Checkout release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.checkout_ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout validation runtime and global policy
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: blackoutsecure/bos-automation-hub
+          ref: main
+          path: hub-release-validation
+          persist-credentials: false
+          sparse-checkout: |
+            .github/actions/job-report
+            .github/actions/release-validation
+            .github/actions/universal-config
+            sync-files/config/release-validation-global-config.json
+
+      - name: Resolve release validation policy
+        id: config
+        uses: ./hub-release-validation/.github/actions/universal-config
+        with:
+          config_path: .github/bos-universal-config.json
+          allow_missing: 'true'
+          global_config_path: hub-release-validation/sync-files/config/release-validation-global-config.json
+          use_global_config: 'true'
+
+      - name: Run release validation
+        id: validate
+        uses: ./hub-release-validation/.github/actions/release-validation
+        with:
+          config: ${{ steps.config.outputs.release_validation }}
+          expected_tag: ${{ inputs.expected_tag }}
+          release_kind: ${{ inputs.release_kind }}
+
+      - name: Publish release validation report
+        id: report
+        if: always()
+        uses: ./hub-release-validation/.github/actions/job-report
+        with:
+          title: Blackout Secure Release Validation Report
+          subject: ${{ github.repository }} @ ${{ inputs.checkout_ref || github.sha }}
+          findings: ${{ steps.validate.outputs.findings || '[]' }}
+          groups: '{"policy":{"title":"Policy","blurb":"Central release policy and configuration."},"metadata":{"title":"Release metadata","blurb":"Required files, tag, and declared versions."},"tests":{"title":"Tests and builds","blurb":"Auto-detected ecosystem checks."},"extensions":{"title":"Repository extensions","blurb":"Optional checks unique to this repository."},"artifacts":{"title":"Artifact integrity","blurb":"Generated output must reproduce without tracked changes."}}'
+          fail_on: ${{ fromJSON(steps.config.outputs.release_validation || '{}').enforce || 'fail' }}
+          enable_json: 'true'
+          json_path: release-validation-report.json
+          enable_artifact_upload: 'true'
+          artifact_name: release-validation-${{ github.run_id }}
+          enable_automation_policy: 'false'

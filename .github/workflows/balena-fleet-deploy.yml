@@ -21,17 +21,17 @@ name: Balena Fleet Deploy
           architecture via `workflow_dispatch`/`repository_dispatch`.
         required: false
         type: string
-        default: ''
+        default: ""
       block_name:
-        description: 'Top-level `name:` written to the rendered `balena.yml`.'
+        description: "Top-level `name:` written to the rendered `balena.yml`."
         required: true
         type: string
       block_version:
-        description: 'Top-level `version:` written to the rendered `balena.yml`.'
+        description: "Top-level `version:` written to the rendered `balena.yml`."
         required: true
         type: string
       block_type:
-        description: 'Top-level `type:` written to the rendered `balena.yml`.'
+        description: "Top-level `type:` written to the rendered `balena.yml`."
         required: false
         type: string
         default: sw.application
@@ -43,7 +43,7 @@ name: Balena Fleet Deploy
           placeholders. Per-target `description` overrides this.
         required: false
         type: string
-        default: ''
+        default: ""
       post_provisioning_template:
         description: >-
           Optional template for the `post-provisioning:` field. Same
@@ -51,41 +51,41 @@ name: Balena Fleet Deploy
           `post_provisioning` overrides this.
         required: false
         type: string
-        default: ''
+        default: ""
       assets_repository_url:
         description: >-
           Optional `assets.repository.data.url`. Must be an
           `https://` URL when set; empty omits the assets block.
         required: false
         type: string
-        default: ''
+        default: ""
       balena_yml_path:
-        description: 'Repo-relative path the rendered `balena.yml` is written to.'
+        description: "Repo-relative path the rendered `balena.yml` is written to."
         required: false
         type: string
         default: ./balena.yml
       source:
-        description: 'Forwarded to `deploy-to-balena-action` as `source`.'
+        description: "Forwarded to `deploy-to-balena-action` as `source`."
         required: false
         type: string
         default: .
       cache:
-        description: 'Forwarded to `deploy-to-balena-action` as `cache`.'
+        description: "Forwarded to `deploy-to-balena-action` as `cache`."
         required: false
         type: boolean
         default: true
       layer_cache:
-        description: 'Forwarded to `deploy-to-balena-action` as `layer_cache`.'
+        description: "Forwarded to `deploy-to-balena-action` as `layer_cache`."
         required: false
         type: boolean
         default: true
       debug:
-        description: 'Forwarded to `deploy-to-balena-action` as `debug`.'
+        description: "Forwarded to `deploy-to-balena-action` as `debug`."
         required: false
         type: boolean
         default: false
       draft:
-        description: 'Publish as a draft (sets `finalize: false`).'
+        description: "Publish as a draft (sets `finalize: false`)."
         required: false
         type: boolean
         default: false
@@ -117,22 +117,22 @@ name: Balena Fleet Deploy
           guaranteed to evaluate against a valid label set.
         required: false
         type: string
-        default: ''
+        default: ""
       timeout_minutes:
-        description: 'Per-deploy job timeout in minutes.'
+        description: "Per-deploy job timeout in minutes."
         required: false
         type: number
         default: 60
     secrets:
       BALENA_API_TOKEN:
-        description: 'balenaCloud API token with deploy access to every fleet in `targets`.'
+        description: "balenaCloud API token with deploy access to every fleet in `targets`."
         required: true
     outputs:
       selected:
-        description: 'JSON list of target names selected for deploy.'
+        description: "JSON list of target names selected for deploy."
         value: ${{ jobs.plan.outputs.selected }}
       count:
-        description: 'Number of fleets selected for deploy.'
+        description: "Number of fleets selected for deploy."
         value: ${{ jobs.plan.outputs.count }}
 
 permissions:
@@ -435,19 +435,19 @@ jobs:
           PY
 
       - name: Render balena.yml
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/render-balena-yml@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/render-balena-yml@main
         with:
-          out_path:               ${{ inputs.balena_yml_path }}
-          name:                   ${{ inputs.block_name }}
-          version:                ${{ inputs.block_version }}
-          block_type:             ${{ inputs.block_type }}
-          description:            ${{ steps.tpl.outputs.description }}
-          post_provisioning:      ${{ steps.tpl.outputs.post_provisioning }}
-          assets_repository_url:  ${{ inputs.assets_repository_url }}
+          out_path: ${{ inputs.balena_yml_path }}
+          name: ${{ inputs.block_name }}
+          version: ${{ inputs.block_version }}
+          block_type: ${{ inputs.block_type }}
+          description: ${{ steps.tpl.outputs.description }}
+          post_provisioning: ${{ steps.tpl.outputs.post_provisioning }}
+          assets_repository_url: ${{ inputs.assets_repository_url }}
           # Preserve legacy fleet-deploy behavior: omit the entire `assets:`
           # block when no repository URL is provided.
-          emit_assets:            ${{ inputs.assets_repository_url != '' }}
-          default_device_type:    ${{ matrix.default_device_type }}
+          emit_assets: ${{ inputs.assets_repository_url != '' }}
+          default_device_type: ${{ matrix.default_device_type }}
           supported_device_types: ${{ matrix.supported_device_types }}
 
       - name: Deploy to balenaCloud
@@ -458,13 +458,13 @@ jobs:
         # socket — the action's `/github/workspace` bind-mount points
         # at a path that only exists inside the runner container, not
         # on the host's read-only rootfs). See
-        # `.github/actions/shared/balena-publish/action.yml` for the
+        # `.github/actions/balena-publish/action.yml` for the
         # full rationale; input contract is a strict subset.
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/balena-publish@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/balena-publish@main
         with:
           balena_token: ${{ secrets.BALENA_API_TOKEN }}
-          fleet:        ${{ matrix.fleet }}
-          source:       ${{ inputs.source }}
+          fleet: ${{ matrix.fleet }}
+          source: ${{ inputs.source }}
           # `force: true` overrides `cache: true` so the action
           # always builds a fresh release even when a release already
           # exists for this commit SHA. `layer_cache` is untouched so
@@ -479,10 +479,10 @@ jobs:
           # it returns false; when force is false it returns whatever
           # `inputs.cache` is set to. Both shapes are stringified by GHA
           # to 'true'/'false' before being passed to the action.
-          cache:        ${{ !inputs.force && inputs.cache }}
-          layer_cache:  ${{ inputs.layer_cache }}
-          debug:        ${{ inputs.debug }}
-          finalize:     ${{ inputs.draft && 'false' || 'true' }}
+          cache: ${{ !inputs.force && inputs.cache }}
+          layer_cache: ${{ inputs.layer_cache }}
+          debug: ${{ inputs.debug }}
+          finalize: ${{ inputs.draft && 'false' || 'true' }}
 
       - name: Job summary
         if: always()

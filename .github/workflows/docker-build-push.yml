@@ -4,26 +4,26 @@ name: Docker Build and Push
   workflow_call:
     inputs:
       image_name:
-        description: 'Image name (without registry/namespace).'
+        description: "Image name (without registry/namespace)."
         required: true
         type: string
       dockerfile:
-        description: 'Path to the Dockerfile.'
+        description: "Path to the Dockerfile."
         required: false
         type: string
         default: ./Dockerfile
       build_target:
-        description: 'Optional Dockerfile stage target to build.'
+        description: "Optional Dockerfile stage target to build."
         required: false
         type: string
-        default: ''
+        default: ""
       build_context:
-        description: 'Docker build context.'
+        description: "Docker build context."
         required: false
         type: string
         default: .
       registry:
-        description: 'Container registry hostname.'
+        description: "Container registry hostname."
         required: false
         type: string
         default: docker.io
@@ -31,7 +31,7 @@ name: Docker Build and Push
         description: "'true'/'false' to force push behaviour. Empty => push only on push to default branch."
         required: false
         type: string
-        default: ''
+        default: ""
       force:
         description: >-
           Force a fresh build by passing `no-cache: true` to docker/build-push-action
@@ -45,35 +45,35 @@ name: Docker Build and Push
         type: boolean
         default: false
       image_version:
-        description: 'Explicit image version tag. Overrides auto-resolved version when set.'
+        description: "Explicit image version tag. Overrides auto-resolved version when set."
         required: false
         type: string
-        default: ''
+        default: ""
       extra_tags:
-        description: 'Newline-separated extra tags to apply to the manifest.'
+        description: "Newline-separated extra tags to apply to the manifest."
         required: false
         type: string
-        default: ''
+        default: ""
       latest:
-        description: 'Also tag the manifest as :latest when pushing.'
+        description: "Also tag the manifest as :latest when pushing."
         required: false
         type: boolean
         default: true
       multi_arch:
-        description: 'Build amd64 + arm64. When false, only amd64 is built.'
+        description: "Build amd64 + arm64. When false, only amd64 is built."
         required: false
         type: boolean
         default: true
       platforms:
-        description: 'Override platform list (comma-separated). Empty => derived from `multi_arch`.'
+        description: "Override platform list (comma-separated). Empty => derived from `multi_arch`."
         required: false
         type: string
-        default: ''
+        default: ""
       build_args:
-        description: 'Newline-separated KEY=VALUE Docker build args.'
+        description: "Newline-separated KEY=VALUE Docker build args."
         required: false
         type: string
-        default: ''
+        default: ""
       version_build_arg:
         description: >-
           Dockerfile ARG name to receive the resolved version at build time
@@ -82,42 +82,42 @@ name: Docker Build and Push
         type: string
         default: APP_VERSION
       inject_oci_build_args:
-        description: 'Inject standard OCI build-args (BUILD_DATE, VCS_REF, VCS_URL).'
+        description: "Inject standard OCI build-args (BUILD_DATE, VCS_REF, VCS_URL)."
         required: false
         type: boolean
         default: true
       auto_resolve_version:
-        description: 'Run the resolve-docker-image-tags composite action.'
+        description: "Run the resolve-docker-image-tags composite action."
         required: false
         type: boolean
         default: true
       version_source:
-        description: '`auto` | `dockerfile` | `file` | `git_tag` | `sha`.'
+        description: "`auto` | `dockerfile` | `file` | `git_tag` | `sha`."
         required: false
         type: string
         default: auto
       version_file:
-        description: 'Plain-text version file path (used by `file`/`auto`).'
+        description: "Plain-text version file path (used by `file`/`auto`)."
         required: false
         type: string
         default: VERSION
       distro:
-        description: 'Optional distro/variant suffix (e.g. `alpine`, `noble`).'
+        description: "Optional distro/variant suffix (e.g. `alpine`, `noble`)."
         required: false
         type: string
-        default: ''
+        default: ""
       build_date:
-        description: 'Override ISO-8601 build date label. Auto-computed when blank.'
+        description: "Override ISO-8601 build date label. Auto-computed when blank."
         required: false
         type: string
-        default: ''
+        default: ""
       manifest_retries:
-        description: 'Retry attempts when creating the manifest.'
+        description: "Retry attempts when creating the manifest."
         required: false
         type: number
         default: 3
       manifest_retry_delay:
-        description: 'Seconds between manifest retry attempts.'
+        description: "Seconds between manifest retry attempts."
         required: false
         type: number
         default: 15
@@ -129,7 +129,7 @@ name: Docker Build and Push
         type: boolean
         default: true
       readme_filepath:
-        description: 'Path to the README uploaded as the Docker Hub full description.'
+        description: "Path to the README uploaded as the Docker Hub full description."
         required: false
         type: string
         default: ./README.md
@@ -141,9 +141,9 @@ name: Docker Build and Push
           leaves the existing short description untouched.
         required: false
         type: string
-        default: ''
+        default: ""
       enable_url_completion:
-        description: 'Convert relative URLs in the README to absolute GitHub URLs.'
+        description: "Convert relative URLs in the README to absolute GitHub URLs."
         required: false
         type: boolean
         default: true
@@ -173,30 +173,30 @@ name: Docker Build and Push
         type: string
         default: cves
       scout_severities:
-        description: 'Comma-separated severities to keep (`critical,high,medium,low,unspecified`).'
+        description: "Comma-separated severities to keep (`critical,high,medium,low,unspecified`)."
         required: false
         type: string
-        default: 'critical,high'
+        default: "critical,high"
       scout_only_fixed:
-        description: 'Filter to CVEs that have a fix available.'
+        description: "Filter to CVEs that have a fix available."
         required: false
         type: boolean
         default: false
       scout_ignore_base:
-        description: 'Ignore vulnerabilities inherited from the base image (`cves` only).'
+        description: "Ignore vulnerabilities inherited from the base image (`cves` only)."
         required: false
         type: boolean
         default: false
       scout_ignore_unchanged:
-        description: 'Filter out unchanged packages (`compare` only).'
+        description: "Filter out unchanged packages (`compare` only)."
         required: false
         type: boolean
         default: true
       scout_to:
-        description: '`compare` only: explicit image reference to compare against.'
+        description: "`compare` only: explicit image reference to compare against."
         required: false
         type: string
-        default: ''
+        default: ""
       scout_to_env:
         description: >-
           `compare` only: Scout environment to compare against (e.g.
@@ -204,7 +204,7 @@ name: Docker Build and Push
           exclusive with `scout_to` / `scout_to_latest`.
         required: false
         type: string
-        default: ''
+        default: ""
       scout_to_latest:
         description: >-
           `compare` only: compare against the latest indexed image
@@ -220,7 +220,7 @@ name: Docker Build and Push
           `scout_record_environment` is non-empty.
         required: false
         type: string
-        default: ''
+        default: ""
       scout_record_environment:
         description: >-
           Publish-mode only: when set, run `docker scout environment`
@@ -229,7 +229,7 @@ name: Docker Build and Push
           Requires `scout_organization`.
         required: false
         type: string
-        default: ''
+        default: ""
       scout_sarif_upload:
         description: >-
           Publish-mode only: upload the Scout SARIF report to GitHub
@@ -240,25 +240,25 @@ name: Docker Build and Push
         type: boolean
         default: true
       scout_write_comment:
-        description: 'PR-mode only: post the Scout output as a PR comment.'
+        description: "PR-mode only: post the Scout output as a PR comment."
         required: false
         type: boolean
         default: true
       scout_keep_previous_comments:
-        description: 'PR-mode only: keep previous Scout comments hidden instead of updating one in place.'
+        description: "PR-mode only: keep previous Scout comments hidden instead of updating one in place."
         required: false
         type: boolean
         default: false
       scout_exit_code:
-        description: 'Exit non-zero (and fail the job) if Scout finds matching vulnerabilities / changes.'
+        description: "Exit non-zero (and fail the job) if Scout finds matching vulnerabilities / changes."
         required: false
         type: boolean
         default: false
       scout_exit_on:
-        description: '`compare` only: comma-separated worsening conditions to fail on (`vulnerability,policy`).'
+        description: "`compare` only: comma-separated worsening conditions to fail on (`vulnerability,policy`)."
         required: false
         type: string
-        default: ''
+        default: ""
       scout_enable_repo:
         description: >-
           Publish-mode only: after a successful manifest push, ensure the
@@ -278,28 +278,28 @@ name: Docker Build and Push
           Docker Hub namespace (org or user) that owns the image. Prefer
           setting this via a repository or organisation `vars.DOCKERHUB_NAMESPACE`
           — namespaces are public information and don't belong in `secrets`.
-          When empty, falls back to `secrets.DOCKERHUB_NAMESPACE` for
-          back-compat.
+          When empty, falls back to `secrets.DOCKERHUB_NAMESPACE` if it is
+          configured.
         required: false
         type: string
-        default: ''
+        default: ""
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_TOKEN:
         required: true
       DOCKERHUB_NAMESPACE:
-        description: 'Deprecated. Pass `dockerhub_namespace` (or set `vars.DOCKERHUB_NAMESPACE`) instead.'
+        description: "Optional legacy override. Prefer `dockerhub_namespace` or `vars.DOCKERHUB_NAMESPACE` instead."
         required: false
     outputs:
       image:
-        description: 'Fully qualified image reference (registry/namespace/name).'
+        description: "Fully qualified image reference (registry/namespace/name)."
         value: ${{ jobs.setup.outputs.image }}
       image_version:
-        description: 'Resolved image version tag.'
+        description: "Resolved image version tag."
         value: ${{ jobs.setup.outputs.image_version }}
       namespace:
-        description: 'Effective Docker Hub namespace.'
+        description: "Effective Docker Hub namespace."
         value: ${{ jobs.setup.outputs.namespace }}
 
 permissions:
@@ -337,8 +337,8 @@ jobs:
           default_runner: ${{ vars.DEFAULT_RUNNER }}
           runner_x64: ${{ vars.RUNNER_X64 }}
           runner_arm64: ${{ vars.RUNNER_ARM64 }}
-          require_runner_x64: 'true'
-          require_runner_arm64: 'true'
+          require_runner_x64: "true"
+          require_runner_arm64: "true"
 
   setup:
     name: Setup
@@ -495,7 +495,7 @@ jobs:
       - name: Resolve image tags
         id: tags
         if: inputs.auto_resolve_version
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/resolve-docker-image-tags@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/resolve-docker-image-tags@main
         with:
           version_override: ${{ inputs.image_version }}
           version_source: ${{ inputs.version_source }}
@@ -507,7 +507,7 @@ jobs:
 
       - name: Resolve release context
         id: ctx
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/resolve-release-context@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/resolve-release-context@main
         with:
           publish_override: ${{ inputs.push }}
           auto_resolve_version: ${{ inputs.auto_resolve_version }}
@@ -632,7 +632,7 @@ jobs:
 
       - name: Compose build args
         id: args
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/compose-docker-build-args@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/compose-docker-build-args@main
         with:
           image_version: ${{ env.IMAGE_VERSION }}
           version_build_arg: ${{ inputs.version_build_arg }}
@@ -815,7 +815,7 @@ jobs:
 
       - name: Create and push manifest
         id: manifest
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/docker-multiarch-manifest@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/docker-multiarch-manifest@main
         with:
           image_ref: ${{ env.IMAGE_REF }}
           digests_dir: ${{ env.DIGESTS_DIR }}
@@ -982,7 +982,7 @@ jobs:
 
       - name: Compose build args
         id: args
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/compose-docker-build-args@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/compose-docker-build-args@main
         with:
           image_version: ${{ needs.setup.outputs.image_version }}
           version_build_arg: ${{ inputs.version_build_arg }}
@@ -1012,7 +1012,7 @@ jobs:
           tags: ${{ env.IMAGE_REF }}:${{ env.SCAN_TAG }}
 
       - name: Run Docker Scout
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/docker-scout-scan@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/docker-scout-scan@main
         with:
           # `local://` forces Scout to use the loaded image and skip
           # any registry round-trip — important because the tag does
@@ -1032,9 +1032,9 @@ jobs:
           exit_on: ${{ inputs.scout_exit_on }}
           # No SARIF in PR mode — code scanning rejects uploads from
           # untrusted PRs (no `security-events: write` for forks).
-          sarif_file: ''
-          sarif_upload: 'false'
-          summary: 'true'
+          sarif_file: ""
+          sarif_upload: "false"
+          summary: "true"
           write_comment: ${{ inputs.scout_write_comment }}
           keep_previous_comments: ${{ inputs.scout_keep_previous_comments }}
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -1088,7 +1088,7 @@ jobs:
           persist-credentials: false
 
       - name: Run Docker Scout (CVEs)
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/docker-scout-scan@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/docker-scout-scan@main
         with:
           # `registry://` forces a registry pull — the runner's local
           # store is empty here (the matrix build pushed by digest from
@@ -1108,27 +1108,27 @@ jobs:
           sarif_file: ${{ inputs.scout_sarif_upload && 'scout.sarif.json' || '' }}
           sarif_upload: ${{ inputs.scout_sarif_upload }}
           sarif_category: docker-scout-${{ inputs.image_name }}
-          summary: 'true'
+          summary: "true"
           # Push events have no PR to comment on.
-          write_comment: 'false'
+          write_comment: "false"
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Record image to Scout environment
         if: inputs.scout_record_environment != ''
-        uses: blackoutsecure/bos-automation-hub/.github/actions/shared/docker-scout-scan@main
+        uses: blackoutsecure/bos-automation-hub/.github/actions/docker-scout-scan@main
         with:
           image: registry://${{ env.IMAGE_REF }}:${{ env.IMAGE_VERSION }}
           command: environment
           environment: ${{ inputs.scout_record_environment }}
           organization: ${{ inputs.scout_organization }}
           # Re-using the login from the previous step in this job.
-          skip_login: 'true'
+          skip_login: "true"
           # `environment` produces no findings to comment / upload.
-          sarif_file: ''
-          sarif_upload: 'false'
-          summary: 'true'
-          write_comment: 'false'
+          sarif_file: ""
+          sarif_upload: "false"
+          summary: "true"
+          write_comment: "false"
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
@@ -1176,6 +1176,5 @@ jobs:
         uses: blackoutsecure/bos-automation-hub/.github/actions/docker-scout-enable-repo@main
         with:
           repository: ${{ needs.setup.outputs.namespace }}/${{ inputs.image_name }}
-          username:   ${{ secrets.DOCKERHUB_USERNAME }}
-          password:   ${{ secrets.DOCKERHUB_TOKEN }}
-
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}

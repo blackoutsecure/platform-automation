@@ -37,16 +37,26 @@ description: >-
   Fail when any `uses:` in this repo's workflows / composite actions
   references a third-party action by tag instead of by 40-char SHA.
 
+inputs:
+  latest_repositories:
+    description: >-
+      Newline-separated owner/repository values allowed to use exactly
+      `@latest`. All other non-SHA refs remain failures.
+    required: false
+    default: ''
+
 runs:
   using: composite
   steps:
     - name: Scan for unpinned `uses:` references
       shell: bash
       env:
+        ALLOW_LATEST_REPOSITORIES: ${{ inputs.latest_repositories }}
         # If a future repo legitimately needs a tag-pin exemption for a
         # specific action (e.g. a trusted first-party GitHub action), add
         # its `owner/repo` here, ONE PER LINE. Default: none.
         ALLOW_TAG_PIN: |
+          blackoutsecure/bos-automation-hub
       run: |
         set -euo pipefail
 
@@ -111,6 +121,10 @@ runs:
             fi
             if grep -Fxq -- "$owner_repo" "$allow_file" 2>/dev/null; then
               # Allow-listed — tag pin permitted.
+              continue
+            fi
+            if [ "$ver" = "latest" ] && printf '%s\n' "$ALLOW_LATEST_REPOSITORIES" | awk 'NF' | grep -Fxq -- "$owner_repo"; then
+              # Explicitly opted-in floating latest reference.
               continue
             fi
             # Enforce: version must be a 40-char hex SHA.

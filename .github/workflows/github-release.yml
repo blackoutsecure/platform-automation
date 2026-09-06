@@ -4,19 +4,19 @@ name: GitHub Release Publisher
   workflow_call:
     inputs:
       tag_name:
-        description: 'Release tag (e.g. `v1.2.3`). Required.'
+        description: "Release tag (e.g. `v1.2.3`). Required."
         required: true
         type: string
       release_name:
-        description: 'Release title. Defaults to `tag_name`.'
+        description: "Release title. Defaults to `tag_name`."
         required: false
         type: string
-        default: ''
+        default: ""
       version:
-        description: 'Resolved version (typically `tag_name` minus leading `v`). Auto-derived when empty.'
+        description: "Resolved version (typically `tag_name` minus leading `v`). Auto-derived when empty."
         required: false
         type: string
-        default: ''
+        default: ""
       image_ref:
         description: >-
           Optional fully qualified image reference (e.g. `docker.io/ns/img`).
@@ -24,28 +24,28 @@ name: GitHub Release Publisher
           included in the release body.
         required: false
         type: string
-        default: ''
+        default: ""
       platforms:
-        description: 'Comma-separated platform list (e.g. `linux/amd64,linux/arm64`).'
+        description: "Comma-separated platform list (e.g. `linux/amd64,linux/arm64`)."
         required: false
         type: string
-        default: ''
+        default: ""
       template_path:
         description: >-
           Path to a Markdown template inside the caller repo. Empty uses
           the bundled default.
         required: false
         type: string
-        default: ''
+        default: ""
       extra_context:
         description: >-
           Newline-separated `KEY=VALUE` pairs interpolated into the
           template as `{{ KEY }}`.
         required: false
         type: string
-        default: ''
+        default: ""
       draft:
-        description: 'Create the release as a draft.'
+        description: "Create the release as a draft."
         required: false
         type: boolean
         default: false
@@ -55,12 +55,12 @@ name: GitHub Release Publisher
           render-release-notes auto-detect from `vX.Y.Z-<suffix>`.
         required: false
         type: string
-        default: ''
+        default: ""
       make_latest:
-        description: '`true`/`false`/`legacy`. Forwarded to softprops/action-gh-release.'
+        description: "`true`/`false`/`legacy`. Forwarded to softprops/action-gh-release."
         required: false
         type: string
-        default: 'true'
+        default: "true"
       generate_release_notes:
         description: >-
           Append GitHub's auto-generated PR/contributor notes after the
@@ -69,15 +69,15 @@ name: GitHub Release Publisher
         type: boolean
         default: true
       target_commitish:
-        description: 'Branch or commit the tag points at. Defaults to the workflow ref.'
+        description: "Branch or commit the tag points at. Defaults to the workflow ref."
         required: false
         type: string
-        default: ''
+        default: ""
       files:
-        description: 'Newline-separated globs of artifacts to attach to the release.'
+        description: "Newline-separated globs of artifacts to attach to the release."
         required: false
         type: string
-        default: ''
+        default: ""
       previous_tag:
         description: >-
           Previous release tag for changelog generation (e.g. `v1.0.0`).
@@ -85,7 +85,7 @@ name: GitHub Release Publisher
           the changelog section.
         required: false
         type: string
-        default: ''
+        default: ""
       source_branch:
         description: >-
           Source branch the feature commits live on (typically `dev`).
@@ -94,7 +94,7 @@ name: GitHub Release Publisher
           Empty disables the changelog section.
         required: false
         type: string
-        default: ''
+        default: ""
       ai_changelog:
         description: >-
           `'true'` to summarize the commit log via GitHub Models
@@ -103,7 +103,7 @@ name: GitHub Release Publisher
           on any AI failure — releases never block on AI availability.
         required: false
         type: string
-        default: 'false'
+        default: "false"
       ai_model:
         description: >-
           GitHub Models model identifier (e.g. `openai/gpt-4o-mini`).
@@ -113,13 +113,13 @@ name: GitHub Release Publisher
         default: auto
     outputs:
       release_id:
-        description: 'GitHub Release ID.'
+        description: "GitHub Release ID."
         value: ${{ jobs.publish.outputs.release_id }}
       release_url:
-        description: 'HTML URL of the published release.'
+        description: "HTML URL of the published release."
         value: ${{ jobs.publish.outputs.release_url }}
       prerelease:
-        description: 'Resolved pre-release flag (`true`/`false`).'
+        description: "Resolved pre-release flag (`true`/`false`)."
         value: ${{ jobs.publish.outputs.prerelease }}
 
 permissions:

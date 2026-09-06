@@ -17,7 +17,7 @@ on:
           convention (`root/etc/nginx/nginx.conf`).
         required: false
         type: string
-        default: 'root/etc/nginx/nginx.conf'
+        default: "root/etc/nginx/nginx.conf"
       templates_path:
         description: >-
           Repo-relative path to a directory of `*.conf.template` files.
@@ -25,7 +25,7 @@ on:
           Set to an empty string to disable template rendering.
         required: false
         type: string
-        default: 'root/etc/nginx/http.d'
+        default: "root/etc/nginx/http.d"
       template_vars:
         description: >-
           Newline-separated `KEY=VALUE` pairs passed to `envsubst` when
@@ -34,7 +34,7 @@ on:
           unchanged.
         required: false
         type: string
-        default: ''
+        default: ""
       templates_target_dir:
         description: >-
           Absolute path inside the validation container where rendered
@@ -42,7 +42,7 @@ on:
           `nginx.conf`.
         required: false
         type: string
-        default: '/run/nginx/http.d'
+        default: "/run/nginx/http.d"
       nginx_image:
         description: >-
           Container image used for validation. Pin to a major +
@@ -50,7 +50,7 @@ on:
           docker ecosystem can bump it.
         required: false
         type: string
-        default: 'docker.io/library/nginx:1.27-alpine'
+        default: "docker.io/library/nginx:1.27-alpine"
       runs_on:
         description: >-
           Optional runner override for the validate job. When empty
@@ -67,16 +67,16 @@ on:
           configuration").
         required: false
         type: string
-        default: ''
+        default: ""
       timeout_minutes:
-        description: 'Per-job timeout.'
+        description: "Per-job timeout."
         required: false
         type: number
         default: 5
 
     outputs:
       validated:
-        description: '`true` when `nginx -t` exited 0.'
+        description: "`true` when `nginx -t` exited 0."
         value: ${{ jobs.validate.outputs.validated }}
 
 permissions:
@@ -124,8 +124,8 @@ jobs:
         id: validate
         uses: blackoutsecure/bos-automation-hub/.github/actions/nginx-config-validate@main
         with:
-          config_path:          ${{ inputs.config_path }}
-          templates_path:       ${{ inputs.templates_path }}
-          template_vars:        ${{ inputs.template_vars }}
+          config_path: ${{ inputs.config_path }}
+          templates_path: ${{ inputs.templates_path }}
+          template_vars: ${{ inputs.template_vars }}
           templates_target_dir: ${{ inputs.templates_target_dir }}
-          nginx_image:          ${{ inputs.nginx_image }}
+          nginx_image: ${{ inputs.nginx_image }}

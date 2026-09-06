@@ -1,0 +1,32 @@
+{
+  "humans_txt": {
+    "audit": {
+      "enable": true,
+      "fail_on": "never",
+      "max_age_days": 365,
+      "rules": {
+        "require_team_section": "fail",
+        "require_site_section": "fail",
+        "require_https_urls": "fail",
+        "valid_last_update": "fail",
+        "require_utf8_no_bom": "fail",
+        "valid_section_syntax": "fail",
+        "site_root_location": "fail",
+        "forbid_placeholder_values": "warn",
+        "last_update_freshness": "warn",
+        "no_duplicate_team_entries": "warn",
+        "require_team_contact": "warn",
+        "file_size_limit": "warn"
+      }
+    },
+    "reporting": {
+      "step_summary": true,
+      "sarif": true,
+      "json_report": true,
+      "recommendations": true
+    },
+    "remediation": {
+      "enable_ai_findings_summary": false
+    }
+  }
+}

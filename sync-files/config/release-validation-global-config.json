@@ -1,0 +1,18 @@
+{
+  "release_validation": {
+    "enabled": true,
+    "enforce": "fail",
+    "run_node": true,
+    "run_python": true,
+    "run_custom": true,
+    "verify_clean_tree": true,
+    "require_lockfile": true,
+    "version_match": "warn",
+    "required_paths": [
+      "README.md",
+      "LICENSE"
+    ],
+    "custom_hook": ".github/scripts/release-validation.sh",
+    "custom_commands": []
+  }
+}

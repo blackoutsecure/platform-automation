@@ -1,0 +1,814 @@
+{
+  "_comment": [
+    "Hand-curated judgement that SPDX does not publish: the OSI",
+    "category, the replacement to recommend for a superseded or",
+    "retired licence, and why a source-available licence is not open",
+    "source. Curated against https://opensource.org/licenses, whose",
+    "category filters exist only as HTML. Merged with SPDX facts by",
+    "scripts/build_osi_catalogue.py."
+  ],
+  "licenses": {
+    "0BSD": {
+      "category": "other",
+      "reciprocity": "public-domain",
+      "prefer": null
+    },
+    "AAL": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "AFL-1.1": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "AFL-3.0"
+    },
+    "AFL-1.2": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "AFL-3.0"
+    },
+    "AFL-2.0": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "AFL-3.0"
+    },
+    "AFL-2.1": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "AFL-3.0"
+    },
+    "AFL-3.0": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "AGPL-3.0": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "AGPL-3.0-only": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "AGPL-3.0-or-later": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "ALGLIB-Documentation": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Apache-1.1": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "Apache-2.0"
+    },
+    "Apache-2.0": {
+      "category": "popular",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "APL-1.0": {
+      "category": "other",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "APSL-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "APSL-2.0"
+    },
+    "APSL-1.1": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "APSL-2.0"
+    },
+    "APSL-1.2": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "APSL-2.0"
+    },
+    "APSL-2.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "Artistic-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "Artistic-2.0"
+    },
+    "Artistic-1.0-cl8": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "Artistic-2.0"
+    },
+    "Artistic-1.0-Perl": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "Artistic-2.0"
+    },
+    "Artistic-2.0": {
+      "category": "other",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "BlueOak-1.0.0": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-1-Clause": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-2-Clause": {
+      "category": "popular",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-2-Clause-Patent": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-3-Clause": {
+      "category": "popular",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-3-Clause-LBNL": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-3-Clause-Open-MPI": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSD-ask-to-endorse": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "BSL-1.0": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "CAL-1.0": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "CAL-1.0-Combined-Work-Exception": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "CATOSL-1.1": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "CDDL-1.0": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "CDDL-1.1": {
+      "category": "uncategorized",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "CECILL-2.1": {
+      "category": "international",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "CERN-OHL-P-2.0": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "CERN-OHL-S-2.0": {
+      "category": "special-purpose",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "CERN-OHL-W-2.0": {
+      "category": "special-purpose",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "CNRI-Python": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "CPAL-1.0": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "CPL-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "EPL-2.0"
+    },
+    "CUA-OPL-1.0": {
+      "category": "retired",
+      "reciprocity": "weak-copyleft",
+      "prefer": "MPL-2.0"
+    },
+    "curl": {
+      "category": "legacy",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "ECL-1.0": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "ECL-2.0"
+    },
+    "ECL-2.0": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "eCos-2.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "EFL-1.0": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "EFL-2.0"
+    },
+    "EFL-2.0": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Entessa": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "EPL-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "EPL-2.0"
+    },
+    "EPL-2.0": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "EUDatagrid": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "EUPL-1.1": {
+      "category": "superseded",
+      "reciprocity": "network-copyleft",
+      "prefer": "EUPL-1.2"
+    },
+    "EUPL-1.2": {
+      "category": "international",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "Fair": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Frameworx-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "GPL-1.0": {
+      "category": "superseded",
+      "reciprocity": "strong-copyleft",
+      "prefer": "GPL-3.0"
+    },
+    "GPL-2.0": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-2.0+": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-2.0-only": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-2.0-or-later": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-3.0": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-3.0+": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-3.0-only": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-3.0-or-later": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "GPL-3.0-with-GCC-exception": {
+      "category": "popular",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "HPND": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "ICU": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Intel": {
+      "category": "retired",
+      "reciprocity": "permissive",
+      "prefer": "BSD-3-Clause"
+    },
+    "IPA": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "IPL-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "ISC": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Jam": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "LGPL-2.0": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.0+": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.0-only": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.0-or-later": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.1": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.1+": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.1-only": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-2.1-or-later": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-3.0": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-3.0+": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-3.0-only": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LGPL-3.0-or-later": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LiLiQ-P-1.1": {
+      "category": "international",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "LiLiQ-R-1.1": {
+      "category": "international",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LiLiQ-Rplus-1.1": {
+      "category": "international",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "LPL-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "LPL-1.02"
+    },
+    "LPL-1.02": {
+      "category": "redundant",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "LPPL-1.3c": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "MirOS": {
+      "category": "uncategorized",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "MIT": {
+      "category": "popular",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "MIT-0": {
+      "category": "other",
+      "reciprocity": "public-domain",
+      "prefer": null
+    },
+    "MIT-CMU": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "MIT-Modern-Variant": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Motosoto": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "MPL-1.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "MPL-2.0"
+    },
+    "MPL-1.1": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "MPL-2.0"
+    },
+    "MPL-2.0": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "MPL-2.0-no-copyleft-exception": {
+      "category": "popular",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "MS-PL": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "MS-RL": {
+      "category": "uncategorized",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "MulanPSL-2.0": {
+      "category": "international",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Multics": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "NASA-1.3": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Naumen": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "NCSA": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "NGPL": {
+      "category": "non-reusable",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "Nokia": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "NPOSL-3.0": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "NTP": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OCLC-2.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "OFL-1.1": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OFL-1.1-no-RFN": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OFL-1.1-RFN": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OGTSL": {
+      "category": "uncategorized",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OLDAP-2.8": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OLFL-1.3": {
+      "category": "special-purpose",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "OSC-1.0": {
+      "category": "international",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "OSET-PL-2.1": {
+      "category": "special-purpose",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "OSL-1.0": {
+      "category": "superseded",
+      "reciprocity": "network-copyleft",
+      "prefer": "OSL-3.0"
+    },
+    "OSL-2.0": {
+      "category": "superseded",
+      "reciprocity": "network-copyleft",
+      "prefer": "OSL-3.0"
+    },
+    "OSL-2.1": {
+      "category": "superseded",
+      "reciprocity": "network-copyleft",
+      "prefer": "OSL-3.0"
+    },
+    "OSL-3.0": {
+      "category": "other",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "PHP-3.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "PHP-3.01"
+    },
+    "PHP-3.01": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "PostgreSQL": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Python-2.0": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "QPL-1.0": {
+      "category": "other",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "RPL-1.1": {
+      "category": "superseded",
+      "reciprocity": "network-copyleft",
+      "prefer": "RPL-1.5"
+    },
+    "RPL-1.5": {
+      "category": "uncategorized",
+      "reciprocity": "network-copyleft",
+      "prefer": null
+    },
+    "RPSL-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "RSCPL": {
+      "category": "non-reusable",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "SimPL-2.0": {
+      "category": "uncategorized",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "SISSL": {
+      "category": "retired",
+      "reciprocity": "weak-copyleft",
+      "prefer": "MPL-2.0"
+    },
+    "Sleepycat": {
+      "category": "non-reusable",
+      "reciprocity": "strong-copyleft",
+      "prefer": null
+    },
+    "SPL-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "UCL-1.0": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Unicode-3.0": {
+      "category": "special-purpose",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Unicode-DFS-2016": {
+      "category": "superseded",
+      "reciprocity": "permissive",
+      "prefer": "Unicode-3.0"
+    },
+    "Unlicense": {
+      "category": "special-purpose",
+      "reciprocity": "public-domain",
+      "prefer": null
+    },
+    "UPL-1.0": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "VSL-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "W3C": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "W3C-20150513": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Watcom-1.0": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "WordNet": {
+      "category": "non-reusable",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "wxWindows": {
+      "category": "non-reusable",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    },
+    "Xnet": {
+      "category": "redundant",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "Zlib": {
+      "category": "other",
+      "reciprocity": "permissive",
+      "prefer": null
+    },
+    "ZPL-2.0": {
+      "category": "superseded",
+      "reciprocity": "weak-copyleft",
+      "prefer": "ZPL-2.1"
+    },
+    "ZPL-2.1": {
+      "category": "redundant",
+      "reciprocity": "weak-copyleft",
+      "prefer": null
+    }
+  },
+  "not_open_source": {
+    "Beerware": "informal and never submitted for OSI review",
+    "BUSL-1.1": "source-available with a delayed open-source conversion date, not OSI-approved",
+    "CC-BY-4.0": "a content licence, not a software licence; OSI does not review it",
+    "CC-BY-NC-4.0": "the NonCommercial clause fails the Open Source Definition",
+    "CC-BY-NC-SA-4.0": "the NonCommercial clause fails the Open Source Definition",
+    "CC-BY-ND-4.0": "the NoDerivatives clause fails the Open Source Definition",
+    "CC-BY-SA-4.0": "a content licence, not a software licence; OSI does not review it",
+    "CC0-1.0": "a public-domain dedication; submitted to the OSI and withdrawn",
+    "Commons-Clause": "a rider that removes the right to sell, voiding open-source status",
+    "Elastic-2.0": "source-available with use restrictions, not OSI-approved",
+    "Hippocratic-2.1": "ethical-use restrictions fail the Open Source Definition",
+    "JSON": "the \"do no evil\" clause fails the Open Source Definition",
+    "PolyForm-Noncommercial-1.0.0": "use restrictions fail the Open Source Definition",
+    "PolyForm-Shield-1.0.0": "use restrictions fail the Open Source Definition",
+    "proprietary": "not an open-source licence",
+    "SEE-LICENSE-IN-FILE": "an npm placeholder, not a licence identifier",
+    "SSPL-1.0": "submitted to the OSI and withdrawn; not OSI-approved",
+    "UNLICENSED": "an npm marker for proprietary code, not the OSI-approved `Unlicense`",
+    "WTFPL": "never submitted for OSI review; carries no warranty disclaimer"
+  },
+  "osi_approved_not_in_spdx": {
+    "GPL-1.0": "OSI lists GNU GPL v1 as superseded; SPDX marks the identifier deprecated and reports isOsiApproved=false",
+    "MIT-CMU": "OSI lists the CMU License; SPDX reports isOsiApproved=false",
+    "curl": "OSI lists the curl License under Legacy; SPDX reports isOsiApproved=false",
+    "eCos-2.0": "OSI lists eCos 2.0 as non-reusable; SPDX marks the identifier deprecated and reports isOsiApproved=false"
+  }
+}
