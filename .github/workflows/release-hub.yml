@@ -331,6 +331,16 @@ jobs:
               git ls-files -z | xargs -0 git rm -f -q --
             fi
             git checkout "${SOURCE_SHA}" -- "${PUBLISH_PATHS[@]}"
+            # The development branch keeps composite actions flat for local
+            # authoring; promoted main exposes them under `shared/`, which is
+            # the stable path used by cross-repository consumers.
+            if [ -d .github/actions ] && [ ! -d .github/actions/shared ]; then
+              mkdir -p .github/actions/shared
+              for action_dir in .github/actions/*/; do
+                [ -d "${action_dir}" ] || continue
+                mv "${action_dir}" .github/actions/shared/
+              done
+            fi
             git add -A
 
             mapfile -t PUBLISHED_WORKFLOWS < <(git ls-files '.github/workflows/*.yml')

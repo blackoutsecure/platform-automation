@@ -708,6 +708,9 @@ def main() -> None:
     assert "uses: ./hub-runtime/.github/actions/universal-config" in sync_backend
     assert "inputs.hub_ref != 'auto' && inputs.hub_ref" in sync_backend
     assert "github.ref_name == 'main' && 'main' || 'dev'" in sync_backend
+    release_hub = (ROOT / ".github/workflows/release-hub.yml").read_text()
+    assert "mkdir -p .github/actions/shared" in release_hub
+    assert "mv \"${action_dir}\" .github/actions/shared/" in release_hub
     assert "github.event_name == 'merge_group'" in sync_backend
 
     # ── standardized reporting ────────────────────────────────────
