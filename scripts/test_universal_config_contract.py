@@ -1031,6 +1031,32 @@ def main() -> None:
             }
         ],
     }
+    assert sync_policy["service_definitions"]["node_ecosystem"]["mode"] == "block"
+    assert sync_policy["service_definitions"]["wranglerignore"] == {
+        "mode": "file",
+        "description": "Cloudflare Wrangler deployment exclusions for the Blackout Secure site.",
+        "files": [
+            {
+                "path": ".wranglerignore",
+                "content_lines": [
+                    "# Managed by https://github.com/blackoutsecure/bos-automation-hub —",
+                    "# do not edit. To modify, update the `wranglerignore` service in",
+                    "# .github/actions/sync-managed-files/sync.py.",
+                    "#",
+                    "# Version Control & Development",
+                    ".git",
+                    ".github",
+                    ".gitignore",
+                    "",
+                    "# IDE & Editor",
+                    ".vscode",
+                    "",
+                    "# Documentation",
+                    "README.md",
+                ],
+            }
+        ],
+    }
     assert {
         name for name in sync_policy["service_definitions"]
         if name.startswith("bos_universal_")
