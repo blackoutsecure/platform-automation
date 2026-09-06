@@ -338,6 +338,7 @@ jobs:
               mkdir -p .github/actions/shared
               for action_dir in .github/actions/*/; do
                 [ -d "${action_dir}" ] || continue
+                [ "$(basename "${action_dir}")" = "shared" ] && continue
                 mv "${action_dir}" .github/actions/shared/
               done
             fi

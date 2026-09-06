@@ -710,6 +710,7 @@ def main() -> None:
     assert "github.ref_name == 'main' && 'main' || 'dev'" in sync_backend
     release_hub = (ROOT / ".github/workflows/release-hub.yml").read_text()
     assert "mkdir -p .github/actions/shared" in release_hub
+    assert '[ "$(basename "${action_dir}")" = "shared" ] && continue' in release_hub
     assert "mv \"${action_dir}\" .github/actions/shared/" in release_hub
     assert "github.event_name == 'merge_group'" in sync_backend
 
